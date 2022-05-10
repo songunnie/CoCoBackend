@@ -1,8 +1,8 @@
 import jwt
 
 
-# JWT 파싱 함수
-def parse_token(token, secret_key, algorithms):
+# JWT 디코딩 함수
+def decode_token(token, secret_key, algorithms):
     if token == None:
         return None
 

@@ -4,9 +4,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
-from utils.token import parse_token
-
-import jwt
+from utils.token import decode_token
 
 # Flask Blueprint 생성
 bp = Blueprint('post', __name__, url_prefix='/post')
@@ -16,7 +14,7 @@ bp = Blueprint('post', __name__, url_prefix='/post')
 @bp.route('', methods=['POST'])
 def write_post():
     token = request.cookies.get('token')
-    payload = parse_token(token, current_app.jwt_secret_key, 'HS256')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
 
     if payload == None:
         return jsonify({
