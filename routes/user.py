@@ -1,11 +1,13 @@
 import hashlib
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, json
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
+from utils.token import decode_token
+
 # Flask Blueprint 생성
-bp = Blueprint('register_user', __name__, url_prefix='/user')
+bp = Blueprint('user', __name__, url_prefix='/user')
 
 
 # 회원가입 라우터 정의
@@ -65,3 +67,26 @@ def register_user():
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
+
+
+@bp.route('/<user_id>', methods=['GET'])
+def get_user(user_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    user = current_app.db.users.find_one({"id": user_id}, {"_id": False})
+
+    return jsonify(**json.loads(json.htmlsafe_dumps({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'user': user
+    }))), STATUS_CODE['SUCCESS']
