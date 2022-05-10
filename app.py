@@ -6,7 +6,7 @@ from presets.status import STATUS_CODE, STATUS_MESSAGE
 
 from pymongo import MongoClient
 
-from routes import post
+from routes import post, post_close
 
 # MongoDB 연결
 mongo_client = MongoClient(f'mongodb://{mongo.config["host"]}', mongo.config['port'])
@@ -18,7 +18,7 @@ app.jwt_secret_key = jwt.config['secret_key']
 
 # Flask Blueprint 연결
 app.register_blueprint(post.bp)
-
+app.register_blueprint(post_close.bp)
 
 # 루트 라우터 정의
 @app.route('/')
