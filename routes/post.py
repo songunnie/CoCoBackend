@@ -139,7 +139,6 @@ def delete_post(post_id):
             'status': STATUS_MESSAGE['FORBIDDEN_USER']
         }), STATUS_CODE['FORBIDDEN_USER']
 
-
     current_app.db.posts.delete_one({'_id': ObjectId(post_id)})
 
     return jsonify({
