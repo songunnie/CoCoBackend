@@ -144,3 +144,47 @@ def delete_post(post_id):
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
+
+
+# 글 수정 라우터
+@bp.route('/<post_id>', methods=['PUT'])
+def update_post(post_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+
+    if post['user_id'] != payload['id']:
+        return jsonify({
+            'status': STATUS_MESSAGE['FORBIDDEN_USER']
+        }), STATUS_CODE['FORBIDDEN_USER']
+
+    title = request.form.get('title')
+    current_group = request.form.getlist('current_group[]')
+    recruitment_fields = request.form.getlist('recruitment_fields[]')
+    region = request.form.get('region')
+    period = request.form.get('period')
+    contact = request.form.get('contact')
+    content = request.form.get('content')
+
+    current_app.db.posts.update_one({'_id': ObjectId(post_id)},
+                                    {'$set': {'title': title,
+                                              'current_group': current_group,
+                                              'recruitment_fields': recruitment_fields,
+                                              'region': region, 'period': period,
+                                              'contact': contact,
+                                              'content': content}})
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS'],
+    }), STATUS_CODE['SUCCESS']
