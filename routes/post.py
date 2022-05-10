@@ -1,6 +1,8 @@
+from bson.objectid import ObjectId
+
 from datetime import datetime
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, json, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
@@ -88,3 +90,27 @@ def write_post():
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
+
+
+# 글 조회 라우터
+@bp.route('/<post_id>', methods=['GET'])
+def get_post(post_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+
+    return jsonify(**json.loads(json.htmlsafe_dumps({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'data': post
+    }))), STATUS_CODE['SUCCESS']
