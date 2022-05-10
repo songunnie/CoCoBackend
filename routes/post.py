@@ -2,6 +2,8 @@ from flask import Blueprint, current_app, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
+import jwt
+
 # Flask Blueprint 생성
 bp = Blueprint('post', __name__, url_prefix='/post')
 
@@ -9,9 +11,23 @@ bp = Blueprint('post', __name__, url_prefix='/post')
 # 글 작성 라우터 정의
 @bp.route('', methods=['POST'])
 def write_post():
+    token = request.cookies.get('token')
+
+    if token == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    payload = jwt.decode(token, current_app.jwt_secret_key, algorithms='HS256')
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
     title = request.form.get('title')
-    current_group = request.form.getlist('current_group')
-    recruitment_fields = request.form.getlist('recruitment_fields')
+    current_group = request.form.getlist('current_group[]')
+    recruitment_fields = request.form.getlist('recruitment_fields[]')
     region = request.form.get('region')
     period = request.form.get('period')
     contact = request.form.get('contact')
@@ -53,6 +69,7 @@ def write_post():
         }), STATUS_CODE['INVALID_PARAM']
 
     doc = {
+        'user_id': payload['id'],
         'title': title,
         'current_group': current_group,
         'recruitment_fields': recruitment_fields,

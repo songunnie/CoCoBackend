@@ -1,4 +1,4 @@
-from conf import mongo
+from conf import jwt, mongo
 
 from flask import Flask, jsonify
 
@@ -14,6 +14,7 @@ mongo_client = MongoClient(f'mongodb://{mongo.config["host"]}', mongo.config['po
 # Flask 애플리케이션 생성
 app = Flask(__name__)
 app.db = mongo_client.coco
+app.jwt_secret_key = jwt.config['secret_key']
 
 # Flask Blueprint 연결
 app.register_blueprint(post.bp)
