@@ -60,3 +60,32 @@ def write_message():
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
+
+
+# 쪽지 조회 라우터
+@bp.route('/<message_id>', methods=['GET'])
+def get_message(message_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    message = current_app.db.messages.find_one({'_id': ObjectId(message_id)}, {'_id': False})
+
+    if message['receiver_user_id'] != payload['id']:
+        return jsonify({
+            'status': STATUS_MESSAGE['FORBIDDEN_USER']
+        }), STATUS_CODE['FORBIDDEN_USER']
+
+    return jsonify(**json.loads(json.htmlsafe_dumps({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'data': message
+    }))), STATUS_CODE['SUCCESS']
