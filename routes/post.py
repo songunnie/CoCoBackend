@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, current_app, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
@@ -77,6 +79,8 @@ def write_post():
         'period': period,
         'contact': contact,
         'content': content,
+        'date': datetime.now(),
+        'hits': 0,
         'recruitment_status': True
     }
 
