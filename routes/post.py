@@ -188,3 +188,20 @@ def update_post(post_id):
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS'],
     }), STATUS_CODE['SUCCESS']
+
+
+# 글 목록 라우터
+@bp.route('/list', methods=['GET'])
+def read_post_list():
+    post_list = list(
+        current_app.db.posts.find({}, {'current_group': False,
+                                       'contact': False,
+                                       'content': False}).sort('_id', -1))
+
+    for index in range(len(post_list)):
+        post_list[index]['_id'] = str(post_list[index]['_id'])
+
+    return jsonify(**json.loads(json.htmlsafe_dumps({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'data': post_list
+    }))), STATUS_CODE['SUCCESS']
