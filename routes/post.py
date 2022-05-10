@@ -4,23 +4,24 @@ from flask import Blueprint, current_app, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
+from utils.token import parse_token
+
 import jwt
 
 # Flask Blueprint 생성
 bp = Blueprint('post', __name__, url_prefix='/post')
 
 
-# 글 작성 라우터 정의
+# 글 작성 라우터
 @bp.route('', methods=['POST'])
 def write_post():
     token = request.cookies.get('token')
+    payload = parse_token(token, current_app.jwt_secret_key, 'HS256')
 
-    if token == None:
+    if payload == None:
         return jsonify({
             'status': STATUS_MESSAGE['INVALID_TOKEN']
         }), STATUS_CODE['INVALID_TOKEN']
-
-    payload = jwt.decode(token, current_app.jwt_secret_key, algorithms='HS256')
 
     if current_app.db.users.find_one({'id': payload['id']}) == None:
         return jsonify({
