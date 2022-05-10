@@ -1,0 +1,62 @@
+from bson.objectid import ObjectId
+
+from datetime import datetime
+
+from flask import Blueprint, current_app, json, jsonify, request
+
+from presets.status import STATUS_CODE, STATUS_MESSAGE
+
+from utils.token import decode_token
+
+# Flask Blueprint 생성
+bp = Blueprint('message', __name__, url_prefix='/message')
+
+
+# 쪽지 작성 라우터
+@bp.route('', methods=['POST'])
+def write_message():
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    receiver_id = request.form.get('receiver_id')
+    title = request.form.get('title')
+    content = request.form.get('content')
+
+    if receiver_id == None or receiver_id == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('receiver_id')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if title == None or title == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('title')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if content == None or content == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('content')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    doc = {
+        'sender_user_id': payload['id'],
+        'receiver_user_id': receiver_id,
+        'title': title,
+        'content': content,
+        'date': datetime.now()
+    }
+
+    current_app.db.messages.insert_one(doc)
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS']
+    }), STATUS_CODE['SUCCESS']
