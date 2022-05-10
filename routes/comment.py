@@ -63,11 +63,14 @@ def get_comment(post_id):
             'status': STATUS_MESSAGE['INVALID_TOKEN']
         }), STATUS_CODE['INVALID_TOKEN']
 
-    comment = current_app.db.comments.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+    comments = list(current_app.db.comments.find({'post_id': post_id}))
+
+    for index in range(len(comments)):
+        comments[index]['_id'] = str(comments[index]['_id'])
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
-        'comment': comment
+        'comments': comments
     }))), STATUS_CODE['SUCCESS']
 
 
