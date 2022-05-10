@@ -52,7 +52,8 @@ def write_message():
         'receiver_user_id': receiver_id,
         'title': title,
         'content': content,
-        'date': datetime.now()
+        'date': datetime.now(),
+        'read': False
     }
 
     current_app.db.messages.insert_one(doc)
@@ -84,6 +85,8 @@ def get_message(message_id):
         return jsonify({
             'status': STATUS_MESSAGE['FORBIDDEN_USER']
         }), STATUS_CODE['FORBIDDEN_USER']
+
+    current_app.db.messages.update_one({'_id': ObjectId(message_id)}, {'$set': {'read': True}})
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
