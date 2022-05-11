@@ -2,6 +2,8 @@ from conf import jwt, mongo
 
 from flask import Flask, jsonify
 
+from flask_cors import CORS
+
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
 from pymongo import MongoClient
@@ -15,6 +17,9 @@ mongo_client = MongoClient(f'mongodb://{mongo.config["host"]}', mongo.config['po
 app = Flask(__name__)
 app.db = mongo_client.coco
 app.jwt_secret_key = jwt.config['secret_key']
+
+# Flask CORS 설정
+cors = CORS(app, resources={r'/*': {'origins': '*'}})
 
 # Flask Blueprint 연결
 app.register_blueprint(bookmark.bp)
