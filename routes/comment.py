@@ -1,17 +1,17 @@
 from bson.objectid import ObjectId
 
-from flask import Blueprint, current_app, jsonify, request, json
+from datetime import datetime
+
+from flask import Blueprint, current_app, json, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
-from datetime import datetime
-
 from utils.token import decode_token
 
-# Flask Blueprint 생성
 bp = Blueprint('comment', __name__, url_prefix='/comment')
 
 
+# 댓글 작성 라우터
 @bp.route('/<post_id>', methods=['POST'])
 def write_comment(post_id):
     token = request.cookies.get('token')
@@ -48,8 +48,9 @@ def write_comment(post_id):
     }), STATUS_CODE['SUCCESS']
 
 
-@bp.route('/<post_id>', methods=['GET'])
-def get_comment(post_id):
+# 댓글 목록 획득 라우터
+@bp.route('/list/<post_id>', methods=['GET'])
+def get_comments(post_id):
     token = request.cookies.get('token')
     payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
 
@@ -74,6 +75,7 @@ def get_comment(post_id):
     }))), STATUS_CODE['SUCCESS']
 
 
+# 댓글 삭제 라우터
 @bp.route('/<comment_id>', methods=['DELETE'])
 def delete_comment(comment_id):
     token = request.cookies.get('token')
@@ -88,6 +90,18 @@ def delete_comment(comment_id):
         return jsonify({
             'status': STATUS_MESSAGE['INVALID_TOKEN']
         }), STATUS_CODE['INVALID_TOKEN']
+
+    comment = current_app.db.comments.find_one({'_id': ObjectId(comment_id)})
+
+    if comment == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if comment['user_id'] != payload['id']:
+        return jsonify({
+            'status': STATUS_MESSAGE['FORBIDDEN_USER']
+        }), STATUS_CODE['FORBIDDEN_USER']
 
     current_app.db.comments.delete_one({'_id': ObjectId(comment_id)})
 
