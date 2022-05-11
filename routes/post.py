@@ -8,7 +8,6 @@ from presets.status import STATUS_CODE, STATUS_MESSAGE
 
 from utils.token import decode_token
 
-# Flask Blueprint 생성
 bp = Blueprint('post', __name__, url_prefix='/post')
 
 
@@ -29,7 +28,7 @@ def write_post():
         }), STATUS_CODE['INVALID_TOKEN']
 
     title = request.form.get('title')
-    current_group = request.form.getlist('current_group[]')
+    tech_stacks = request.form.getlist('tech_stacks[]')
     recruitment_fields = request.form.getlist('recruitment_fields[]')
     region = request.form.get('region')
     period = request.form.get('period')
@@ -41,9 +40,9 @@ def write_post():
             'status': STATUS_MESSAGE['INVALID_PARAM']('title')
         }), STATUS_CODE['INVALID_PARAM']
 
-    if len(current_group) == 0:
+    if len(tech_stacks) == 0:
         return jsonify({
-            'status': STATUS_MESSAGE['INVALID_PARAM']('current_group')
+            'status': STATUS_MESSAGE['INVALID_PARAM']('tech_stacks')
         }), STATUS_CODE['INVALID_PARAM']
 
     if len(recruitment_fields) == 0:
@@ -74,7 +73,7 @@ def write_post():
     doc = {
         'user_id': payload['id'],
         'title': title,
-        'current_group': current_group,
+        'tech_stacks': tech_stacks,
         'recruitment_fields': recruitment_fields,
         'region': region,
         'period': period,
@@ -92,7 +91,7 @@ def write_post():
     }), STATUS_CODE['SUCCESS']
 
 
-# 글 조회 라우터
+# 글 내용 획득 라우터
 @bp.route('/<post_id>', methods=['GET'])
 def get_post(post_id):
     token = request.cookies.get('token')
@@ -110,12 +109,157 @@ def get_post(post_id):
 
     post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
 
+    if post == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
     current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$inc': {'hits': 1}})
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
-        'data': post,
+        'post': post
     }))), STATUS_CODE['SUCCESS']
+
+
+# 글 목록 획득 라우터
+@bp.route('/list', methods=['GET'])
+def get_posts():
+    posts = list(current_app.db.posts.find({}, {
+        'contact': False,
+        'content': False
+    }).sort('_id', -1))
+
+    for index in range(len(posts)):
+        posts[index]['_id'] = str(posts[index]['_id'])
+
+    return jsonify(**json.loads(json.htmlsafe_dumps({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'posts': posts
+    }))), STATUS_CODE['SUCCESS']
+
+
+# 글 수정 라우터
+@bp.route('/<post_id>', methods=['PUT'])
+def update_post(post_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    title = request.form.get('title')
+    tech_stacks = request.form.getlist('tech_stacks[]')
+    recruitment_fields = request.form.getlist('recruitment_fields[]')
+    region = request.form.get('region')
+    period = request.form.get('period')
+    contact = request.form.get('contact')
+    content = request.form.get('content')
+
+    if title == None or title == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('title')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if len(tech_stacks) == 0:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('tech_stacks')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if len(recruitment_fields) == 0:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('recruitment_fields')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if region == None or region == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('region')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if period == None or period == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('period')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if contact == None or contact == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('contact')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if content == None or content == '':
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('content')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+
+    if post == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if post['user_id'] != payload['id']:
+        return jsonify({
+            'status': STATUS_MESSAGE['FORBIDDEN_USER']
+        }), STATUS_CODE['FORBIDDEN_USER']
+
+    doc = {
+        'title': title,
+        'tech_stacks': tech_stacks,
+        'recruitment_fields': recruitment_fields,
+        'region': region,
+        'period': period,
+        'contact': contact,
+        'content': content
+    }
+
+    current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$set': doc})
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS']
+    }), STATUS_CODE['SUCCESS']
+
+
+# 모집 마감 라우터
+@bp.route('/close/<post_id>', methods=['PUT'])
+def close_post(post_id):
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
+
+    if post == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if post['user_id'] != payload['id']:
+        return jsonify({
+            'status': STATUS_MESSAGE['FORBIDDEN_USER']
+        }), STATUS_CODE['FORBIDDEN_USER']
+
+    current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$set': {'recruitment_status': False}})
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS']
+    }), STATUS_CODE['SUCCESS']
 
 
 # 글 삭제 라우터
@@ -136,6 +280,11 @@ def delete_post(post_id):
 
     post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
 
+    if post == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
     if post['user_id'] != payload['id']:
         return jsonify({
             'status': STATUS_MESSAGE['FORBIDDEN_USER']
@@ -146,64 +295,3 @@ def delete_post(post_id):
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
-
-
-# 글 수정 라우터
-@bp.route('/<post_id>', methods=['PUT'])
-def update_post(post_id):
-    token = request.cookies.get('token')
-    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
-
-    if payload == None:
-        return jsonify({
-            'status': STATUS_MESSAGE['INVALID_TOKEN']
-        }), STATUS_CODE['INVALID_TOKEN']
-
-    if current_app.db.users.find_one({'id': payload['id']}) == None:
-        return jsonify({
-            'status': STATUS_MESSAGE['INVALID_TOKEN']
-        }), STATUS_CODE['INVALID_TOKEN']
-
-    post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
-
-    if post['user_id'] != payload['id']:
-        return jsonify({
-            'status': STATUS_MESSAGE['FORBIDDEN_USER']
-        }), STATUS_CODE['FORBIDDEN_USER']
-
-    title = request.form.get('title')
-    current_group = request.form.getlist('current_group[]')
-    recruitment_fields = request.form.getlist('recruitment_fields[]')
-    region = request.form.get('region')
-    period = request.form.get('period')
-    contact = request.form.get('contact')
-    content = request.form.get('content')
-
-    current_app.db.posts.update_one({'_id': ObjectId(post_id)},
-                                    {'$set': {'title': title,
-                                              'current_group': current_group,
-                                              'recruitment_fields': recruitment_fields,
-                                              'region': region, 'period': period,
-                                              'contact': contact,
-                                              'content': content}})
-
-    return jsonify({
-        'status': STATUS_MESSAGE['SUCCESS'],
-    }), STATUS_CODE['SUCCESS']
-
-
-# 글 목록 라우터
-@bp.route('/list', methods=['GET'])
-def read_post_list():
-    post_list = list(
-        current_app.db.posts.find({}, {'current_group': False,
-                                       'contact': False,
-                                       'content': False}).sort('_id', -1))
-
-    for index in range(len(post_list)):
-        post_list[index]['_id'] = str(post_list[index]['_id'])
-
-    return jsonify(**json.loads(json.htmlsafe_dumps({
-        'status': STATUS_MESSAGE['SUCCESS'],
-        'data': post_list
-    }))), STATUS_CODE['SUCCESS']

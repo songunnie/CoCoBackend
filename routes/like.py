@@ -1,17 +1,17 @@
-import jwt
-from flask import Blueprint, current_app, jsonify, request, json
+from flask import Blueprint, current_app, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
-# Flask Blueprint 생성
+from utils.token import decode_token
+
 bp = Blueprint('like', __name__, url_prefix='/like')
 
 
-# 좋아요 기능
+# 좋아요 전환 라우터
 @bp.route('/<post_id>', methods=['PUT'])
 def toggle_like(post_id):
     token = request.cookies.get('token')
-    payload = jwt.decode(token, current_app.jwt_secret_key, algorithms='HS256')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
 
     if payload == None:
         return jsonify({
@@ -27,7 +27,8 @@ def toggle_like(post_id):
         'post_id': post_id,
         'user_id': payload['id']
     }
-    like = current_app.db.likes.find_one({'post_id': post_id, 'user_id': payload['id']})
+
+    like = current_app.db.likes.find_one(doc)
 
     if like == None:
         current_app.db.likes.insert_one(doc)
