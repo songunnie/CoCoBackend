@@ -31,7 +31,15 @@ app.register_blueprint(post.bp)
 app.register_blueprint(user.bp)
 
 
-# 루트 라우터 정의
+# 요청 핸들러
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    return response
+
+
+# 루트 라우터
 @app.route('/')
 def index():
     return jsonify({
