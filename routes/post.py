@@ -110,9 +110,11 @@ def get_post(post_id):
 
     post = current_app.db.posts.find_one({'_id': ObjectId(post_id)}, {'_id': False})
 
+    current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$inc': {'hits': 1}})
+
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
-        'data': post
+        'data': post,
     }))), STATUS_CODE['SUCCESS']
 
 
