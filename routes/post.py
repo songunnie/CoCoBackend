@@ -114,6 +114,25 @@ def get_post(post_id):
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
 
+    user = current_app.db.users.find_one({'id': post['user_id']})
+    post['user_nickname'] = user['nickname']
+
+    likes = current_app.db.likes.count_documents({'post_id': post_id})
+    post['likes'] = likes
+
+    current_user_like = current_app.db.likes.find_one({
+        'post_id': post_id,
+        'user_id': payload['id']
+    })
+
+    current_user_bookmark = current_app.db.bookmarks.find_one({
+        'post_id': post_id,
+        'user_id': payload['id']
+    })
+
+    post['current_user_like'] = current_user_like != None
+    post['current_user_bookmark'] = current_user_bookmark != None
+
     current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$inc': {'hits': 1}})
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
@@ -125,6 +144,10 @@ def get_post(post_id):
 # 글 목록 획득 라우터
 @bp.route('/list', methods=['GET'])
 def get_posts():
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+    token_validation = payload != None and current_app.db.users.find_one({'id': payload['id']}) != None
+
     posts = list(current_app.db.posts.find({}, {
         'contact': False,
         'content': False
@@ -132,6 +155,23 @@ def get_posts():
 
     for index in range(len(posts)):
         posts[index]['_id'] = str(posts[index]['_id'])
+
+        likes = current_app.db.likes.count_documents({'post_id': posts[index]['_id']})
+        posts[index]['likes'] = likes
+
+        if token_validation == True:
+            current_user_like = current_app.db.likes.find_one({
+                'post_id': posts[index]['_id'],
+                'user_id': payload['id']
+            })
+
+            current_user_bookmark = current_app.db.bookmarks.find_one({
+                'post_id': posts[index]['_id'],
+                'user_id': payload['id']
+            })
+
+            posts[index]['current_user_like'] = current_user_like != None
+            posts[index]['current_user_bookmark'] = current_user_bookmark != None
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
