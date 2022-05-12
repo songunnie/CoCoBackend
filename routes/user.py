@@ -1,3 +1,5 @@
+from conf import storage
+
 from flask import Blueprint, current_app, json, jsonify, request
 
 from presets.status import STATUS_CODE, STATUS_MESSAGE
@@ -53,7 +55,7 @@ def register():
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
 
-    if user['validation'] == 'valid':
+    if user['validation'] != 'invalid':
         return jsonify({
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
@@ -63,7 +65,7 @@ def register():
     doc = {
         'password': hashed_password,
         'nickname': nickname,
-        'image': '',
+        'image': f'{storage.config["host"]}/images/profile/default.png',
         'github_url': github_url,
         'portfolio_url': portfolio_url,
         'tech_stacks': tech_stacks,
