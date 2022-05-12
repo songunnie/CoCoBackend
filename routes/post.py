@@ -125,6 +125,10 @@ def get_post(post_id):
 # 글 목록 획득 라우터
 @bp.route('/list', methods=['GET'])
 def get_posts():
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+    token_validation = payload != None and current_app.db.users.find_one({'id': payload['id']}) != None
+
     posts = list(current_app.db.posts.find({}, {
         'contact': False,
         'content': False
@@ -132,6 +136,23 @@ def get_posts():
 
     for index in range(len(posts)):
         posts[index]['_id'] = str(posts[index]['_id'])
+
+        likes = current_app.db.likes.count_documents({'post_id': posts[index]['_id']})
+        posts[index]['likes'] = likes
+
+        if token_validation == True:
+            user_like = current_app.db.likes.find_one({
+                'post_id': posts[index]['_id'],
+                'user_id': payload['id']
+            })
+
+            user_bookmark = current_app.db.bookmarks.find_one({
+                'post_id': posts[index]['_id'],
+                'user_id': payload['id']
+            })
+
+            posts[index]['user_like'] = user_like != None
+            posts[index]['user_bookmark'] = user_bookmark != None
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
