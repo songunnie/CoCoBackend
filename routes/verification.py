@@ -58,3 +58,44 @@ def send_verification_mail():
     return jsonify({
         'status': STATUS_MESSAGE['SUCCESS']
     }), STATUS_CODE['SUCCESS']
+
+
+@bp.route('', methods=['PUT'])
+def verify_mail():
+    id = request.form.get('id')
+    code = request.form.get('code')
+
+    if id == None or id == '' or check_id(id) == False:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('id')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    if code == None or len(code) != 6:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('code')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    verification = current_app.db.verifications.find_one({'user_id': id})
+
+    if verification == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if verification['code'] != code:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_VERIFICATION_CODE']
+        }), STATUS_CODE['INVALID_VERIFICATION_CODE']
+
+    current_app.db.verifications.delete_one({'user_id': id})
+
+    doc = {
+        'id': id,
+        'validation': 'invalid'
+    }
+
+    current_app.db.users.insert_one(doc)
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS']
+    }), STATUS_CODE['SUCCESS']
