@@ -107,3 +107,46 @@ def get_user(user_id):
         'status': STATUS_MESSAGE['SUCCESS'],
         'user': user
     }))), STATUS_CODE['SUCCESS']
+
+
+# 회원 탈퇴 라우터
+@bp.route('', methods=['DELETE'])
+def delete_user():
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    password = request.headers.get('password')
+
+    if password == None or password == '' or check_password(password) == False:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_PARAM']('password')
+        }), STATUS_CODE['INVALID_PARAM']
+
+    user = current_app.db.users.find_one({'id': payload['id']})
+    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+    if user['validation'] != 'valid':
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if user['password'] != hashed_password:
+        return jsonify({
+            'status': STATUS_MESSAGE['UNAUTHORIZED_USER']
+        }), STATUS_CODE['UNAUTHORIZED_USER']
+
+    current_app.db.users.update_one({'id': payload['id']}, {'$set': {'validation': 'leave'}})
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS']
+    }), STATUS_CODE['SUCCESS']
