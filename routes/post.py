@@ -160,18 +160,18 @@ def get_posts():
         posts[index]['likes'] = likes
 
         if token_validation == True:
-            user_like = current_app.db.likes.find_one({
+            current_user_like = current_app.db.likes.find_one({
                 'post_id': posts[index]['_id'],
                 'user_id': payload['id']
             })
 
-            user_bookmark = current_app.db.bookmarks.find_one({
+            current_user_bookmark = current_app.db.bookmarks.find_one({
                 'post_id': posts[index]['_id'],
                 'user_id': payload['id']
             })
 
-            posts[index]['user_like'] = user_like != None
-            posts[index]['user_bookmark'] = user_bookmark != None
+            posts[index]['current_user_like'] = current_user_like != None
+            posts[index]['current_user_bookmark'] = current_user_bookmark != None
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
         'status': STATUS_MESSAGE['SUCCESS'],
