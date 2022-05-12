@@ -6,7 +6,6 @@ from utils.regex import check_password
 from utils.token import decode_token
 
 import hashlib
-import re
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -54,7 +53,7 @@ def register():
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
 
-    if user['verification'] == False:
+    if user['validation'] == 'valid':
         return jsonify({
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
@@ -68,7 +67,8 @@ def register():
         'github_url': github_url,
         'portfolio_url': portfolio_url,
         'tech_stacks': tech_stacks,
-        'introduction': ''
+        'introduction': '',
+        'validation': 'valid'
     }
 
     current_app.db.users.update_one({'id': id}, {'$set': doc})

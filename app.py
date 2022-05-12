@@ -1,22 +1,32 @@
-from conf import jwt, mongo
+from conf import jwt, mail, mongo
 
 from flask import Flask, jsonify
 
 from flask_cors import CORS
 
+from flask_mail import Mail
+
 from presets.status import STATUS_CODE, STATUS_MESSAGE
 
 from pymongo import MongoClient
 
-from routes import bookmark, comment, like, login, message, post, user
+from routes import bookmark, comment, like, login, message, post, user, verification
 
 # MongoDB 연결
 mongo_client = MongoClient(f'mongodb://{mongo.config["host"]}', mongo.config['port'])
 
 # Flask 애플리케이션 생성
 app = Flask(__name__)
+app.config['MAIL_SERVER'] = mail.config['server']
+app.config['MAIL_PORT'] = mail.config['port']
+app.config['MAIL_USERNAME'] = mail.config['id']
+app.config['MAIL_PASSWORD'] = mail.config['password']
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
 app.db = mongo_client.coco
 app.jwt_secret_key = jwt.config['secret_key']
+app.mail = Mail(app)
 
 # Flask CORS 설정
 cors = CORS(app, resources={r'/*': {'origins': '*'}})
@@ -29,6 +39,7 @@ app.register_blueprint(login.bp)
 app.register_blueprint(message.bp)
 app.register_blueprint(post.bp)
 app.register_blueprint(user.bp)
+app.register_blueprint(verification.bp)
 
 
 # 요청 핸들러
