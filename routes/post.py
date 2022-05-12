@@ -114,6 +114,25 @@ def get_post(post_id):
             'status': STATUS_MESSAGE['BAD_REQUEST']
         }), STATUS_CODE['BAD_REQUEST']
 
+    user = current_app.db.users.find_one({'id': post['user_id']})
+    post['user_nickname'] = user['nickname']
+
+    likes = current_app.db.likes.count_documents({'post_id': post_id})
+    post['likes'] = likes
+
+    current_user_like = current_app.db.likes.find_one({
+        'post_id': post_id,
+        'user_id': payload['id']
+    })
+
+    current_user_bookmark = current_app.db.bookmarks.find_one({
+        'post_id': post_id,
+        'user_id': payload['id']
+    })
+
+    post['current_user_like'] = current_user_like != None
+    post['current_user_bookmark'] = current_user_bookmark != None
+
     current_app.db.posts.update_one({'_id': ObjectId(post_id)}, {'$inc': {'hits': 1}})
 
     return jsonify(**json.loads(json.htmlsafe_dumps({
