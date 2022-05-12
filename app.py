@@ -1,4 +1,4 @@
-from conf import jwt, mail, mongo
+from conf import aws, jwt, mail, mongo
 
 from flask import Flask, jsonify
 
@@ -11,6 +11,8 @@ from presets.status import STATUS_CODE, STATUS_MESSAGE
 from pymongo import MongoClient
 
 from routes import bookmark, comment, like, login, message, post, user, verification
+
+import boto3
 
 # MongoDB 연결
 mongo_client = MongoClient(f'mongodb://{mongo.config["host"]}', mongo.config['port'])
@@ -27,6 +29,11 @@ app.config['MAIL_USE_SSL'] = True
 app.db = mongo_client.coco
 app.jwt_secret_key = jwt.config['secret_key']
 app.mail = Mail(app)
+app.s3 = boto3.client(
+    service_name='s3',
+    aws_access_key_id=aws.config['access_key_id'],
+    aws_secret_access_key=aws.config['secret_access_key']
+)
 
 # Flask CORS 설정
 cors = CORS(app, resources={r'/*': {'origins': '*'}})
