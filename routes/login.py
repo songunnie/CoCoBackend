@@ -26,14 +26,20 @@ def login():
             'status': STATUS_MESSAGE['INVALID_PARAM']('password')
         }), STATUS_CODE['INVALID_PARAM']
 
+    user = current_app.db.users.find_one({'id': id})
     hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-    user = current_app.db.users.find_one({
-        'id': id,
-        'password': hashed_password
-    })
-
     if user == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if user['validation'] != 'valid':
+        return jsonify({
+            'status': STATUS_MESSAGE['BAD_REQUEST']
+        }), STATUS_CODE['BAD_REQUEST']
+
+    if user['password'] != hashed_password:
         return jsonify({
             'status': STATUS_MESSAGE['UNAUTHORIZED_USER']
         }), STATUS_CODE['UNAUTHORIZED_USER']
