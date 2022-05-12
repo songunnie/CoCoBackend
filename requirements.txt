@@ -1,4 +1,7 @@
 Flask
+Flask-Cors
+Flask-Mail
 PyJWT
+boto3
 pymongo
 requests
