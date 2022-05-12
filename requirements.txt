@@ -1,5 +1,6 @@
 Flask
 Flask-Cors
+Flask-Mail
 PyJWT
 pymongo
 requests

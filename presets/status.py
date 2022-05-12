@@ -4,7 +4,9 @@ STATUS_CODE = {
     'INVALID_TOKEN': 400,
     'INVALID_PARAM': 400,
     'UNAUTHORIZED_USER': 401,
-    'FORBIDDEN_USER': 403
+    'FORBIDDEN_USER': 403,
+    'DUPLICATED_USER': 409,
+    'ALREADY_SENT_VERIFICATION_MAIL': 429
 }
 
 STATUS_MESSAGE = {
@@ -13,5 +15,7 @@ STATUS_MESSAGE = {
     'INVALID_TOKEN': 'Invalid token',
     'INVALID_PARAM': lambda param: f'Invalid {param} param',
     'UNAUTHORIZED_USER': 'Unauthorized user',
-    'FORBIDDEN_USER': 'Forbidden user'
+    'FORBIDDEN_USER': 'Forbidden user',
+    'DUPLICATED_USER': 'Duplicated user',
+    'ALREADY_SENT_VERIFICATION_MAIL': 'Already sent verification mail'
 }
