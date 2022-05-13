@@ -60,6 +60,7 @@ def send_verification_mail():
     }), STATUS_CODE['SUCCESS']
 
 
+# 메일 인증 라우터
 @bp.route('', methods=['PUT'])
 def verify_mail():
     id = request.form.get('id')
