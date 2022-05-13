@@ -80,6 +80,28 @@ def register():
     }), STATUS_CODE['SUCCESS']
 
 
+# 현재 사용자 ID 획득 라우터
+@bp.route('', methods=['GET'])
+def get_current_user_id():
+    token = request.cookies.get('token')
+    payload = decode_token(token, current_app.jwt_secret_key, 'HS256')
+
+    if payload == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    if current_app.db.users.find_one({'id': payload['id']}) == None:
+        return jsonify({
+            'status': STATUS_MESSAGE['INVALID_TOKEN']
+        }), STATUS_CODE['INVALID_TOKEN']
+
+    return jsonify({
+        'status': STATUS_MESSAGE['SUCCESS'],
+        'id': payload['id']
+    }), STATUS_CODE['SUCCESS']
+
+
 # 회원 정보 획득 라우터
 @bp.route('/<user_id>', methods=['GET'])
 def get_user(user_id):
