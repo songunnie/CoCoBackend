@@ -1,5 +1,10 @@
-# Python Caches
-**/__pycache__/
+# OS Caches
+**/.DS_Store
 
-# PyCharm Caches
-.idea/
+# JetBrains Caches
+**/.idea/
+**/out/
+
+# Gradle Caches
+**/.gradle/
+**/build/
