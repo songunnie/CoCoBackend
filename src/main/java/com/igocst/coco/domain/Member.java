@@ -1,17 +1,16 @@
 package com.igocst.coco.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.igocst.coco.domain.timestamped.Timestamped;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
-@Getter
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,16 +37,54 @@ public class Member extends Timestamped {
 
     // 게시글 양방향
     @OneToMany(mappedBy = "member")
+    @Builder.Default    // 빌더를 클래스레벨에 달아놔서 초기화 위해 필요, 생성자에 빌더를 달면 안써도 됨
     private List<Post> posts = new ArrayList<>();
 
     // 댓글 양방향
     @OneToMany(mappedBy = "member")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     // 쪽지 양방향
     @OneToMany(mappedBy = "sender")
+    @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver")
+    @Builder.Default
     private List<Message> receiveMessage = new ArrayList<>();
+
+    /**
+     * 연관관계 메소드
+     *
+     */
+    // 회원의 게시글 중에서 특정 게시글 삭제
+    public boolean deletePost(Long postId) {
+        if (postId <= 0) {
+            return false;
+        }
+        // 리스트를 돌아서 해당하는 게시글을 찾는다
+        Iterator<Post> iterator = posts.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(postId)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 회원이 작성한 특정 게시글을 찾는다.
+    public Post findPost(Long postId) {
+        if (postId <= 0) {
+            return null;
+        }
+        Iterator<Post> iterator = posts.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(postId)) {
+                return iterator.next();
+            }
+        }
+        return null;
+    }
 }
