@@ -30,7 +30,6 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
     private String profileImageUrl;
     private String githubUrl;
     private String portfolioUrl;
