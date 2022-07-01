@@ -1,10 +1,9 @@
 package com.igocst.coco.security.filter;
 
 import com.igocst.coco.security.jwt.JwtTokenProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
@@ -16,24 +15,29 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 // JWT 사용을 위한 필터
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             // JWT 토큰을 얻어온다
-            String token = getTokenFromRequest(request);
+            String token = jwtTokenProvider.resolveToken(request);
 
             // JWT 토큰 검사
             if (JwtTokenProvider.validateToken(token)) {
-                String email = JwtTokenProvider.getMemberEmailFromToken(token);
+//                String email = JwtTokenProvider.getMemberEmailFromToken(token);
 
                 // 시큐리티 인증
                 // 아직 권한 설정하지 않음 (관리자, 일반 사용자)
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, null);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // UsernamePasswordAuthenticationToken 지양, 딴 거 쓰기
+//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, null);
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 완료
             } else {
                 request.setAttribute("unAuthorization", "인증실패");
             }

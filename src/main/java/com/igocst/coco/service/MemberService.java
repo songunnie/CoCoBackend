@@ -7,11 +7,8 @@ import com.igocst.coco.dto.member.LoginResponseDto;
 import com.igocst.coco.dto.member.RegisterRequestDto;
 import com.igocst.coco.dto.member.RegisterResponseDto;
 import com.igocst.coco.repository.MemberRepository;
-import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +32,9 @@ public class MemberService {
         }
 
         // JWT 토큰 만들어서 반환하기
-        // ...
-        Authentication authentication = new UsernamePasswordAuthenticationToken(requestDto.getEmail(), null, null);
-        String token = JwtTokenProvider.generateToken(authentication);
+//        Authentication authentication = new UsernamePasswordAuthenticationToken(requestDto.getEmail(), null, null);
+//        String token = JwtTokenProvider.generateToken(authentication);
+        String token = JwtTokenProvider.generateToken(requestDto.getEmail());
 
         return LoginResponseDto.builder()
                 .status("200")
