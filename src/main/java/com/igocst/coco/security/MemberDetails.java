@@ -1,9 +1,12 @@
 package com.igocst.coco.security;
 
 import com.igocst.coco.domain.Member;
+import com.igocst.coco.domain.MemberRole;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -19,10 +22,26 @@ public class MemberDetails implements UserDetails {
         return member;
     }
 
+
+    /**
+     * 스프링 시큐리티가 권한을 이해하기 위해선 'ROLE_'가 앞에 있어야 한다
+     * 일반 사용자 = ROLE_MEMBER
+     * 관리자 = ROLE_ADMIN
+     */
+//    private static final String ROLE_PREFIX = "ROLE_";
+
     // 인가 부분
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        MemberRole memberRole = member.getRole();
+        String authority = memberRole.getAuthority();
+
+        // 시큐리티에 권한을 전달
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(simpleGrantedAuthority);
+
+        return authorities;
     }
 
     @Override

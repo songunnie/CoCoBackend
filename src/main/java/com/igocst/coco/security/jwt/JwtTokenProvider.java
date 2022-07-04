@@ -17,7 +17,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final String SECRET_KEY = "COCO";
+    private static final String SECRET_KEY = "COCOPROJECTLETSGO";
+    // 만료 시간 어떻게?, 1시간? 6시간? 하루?
     private static final int EXPIRATION_MS = 3600000;
     private final MemberDetailsService memberDetailsService;
 
@@ -47,14 +48,34 @@ public class JwtTokenProvider {
 
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
+        // UserDetailsService에서 DB에 JWT 토큰으로 넣어둔 email과 일치하는 데이터가 있으면 가져온다. ( MemberDetails )
         MemberDetails memberDetails = memberDetailsService.loadUserByUsername(getMemberEmailFromToken(token));
-        return new UsernamePasswordAuthenticationToken(memberDetails, "", null);  // 권한은 아직
+        return new UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.getAuthorities());
     }
+
+    private final static String HEADER_AUTHORIZATION = "Authorization";
+    private final static String TOKEN_PREFIX = "Bearer ";
 
     // http 요청 헤더에서 JWT 토큰 값 가져오기
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader("X-AUTH-TOKEN");
     }
+
+//    public String resolveToken(HttpServletRequest request) {
+//        String headerValue = request.getHeader(HEADER_AUTHORIZATION);
+//        if (headerValue == null) {
+//            throw new RuntimeException("토큰 정보가 없습니다.");
+//        }
+//
+//        return headerValue;
+
+//        if (!headerValue.startsWith(TOKEN_PREFIX)) {
+//            throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
+//        }
+//
+//        // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
+//        return headerValue.substring(TOKEN_PREFIX.length());
+//    }
 
     // JWT 토큰 예외 검사
     public static boolean validateToken(String token) {

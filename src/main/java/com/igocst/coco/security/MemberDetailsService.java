@@ -21,7 +21,7 @@ public class MemberDetailsService implements UserDetailsService {
                 () -> new UsernameNotFoundException("일치하는 회원 정보가 없습니다." + email)
         );
 
-        // DB에 일치하는 회원이 있으면 UserDetails로 보냄
+        // DB에 일치하는 회원이 있으면 MemberDetails로 보냄
         return new MemberDetails(member);
     }
 }

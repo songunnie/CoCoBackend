@@ -5,6 +5,7 @@ import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -39,13 +41,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
+                // 아래의 URI는 무조건 인증 통과
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/user").permitAll()
                 .antMatchers("/login").permitAll()
+                // 이외의 URI는 인증을 거친다.
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin().disable()
+                // JWT 필터를 추가, 요청이 올때마다 JWT 토큰을 검사한다.
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

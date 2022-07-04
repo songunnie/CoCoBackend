@@ -35,6 +35,10 @@ public class Member extends Timestamped {
     private String portfolioUrl;
     private String introduction;
 
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private MemberRole role;
+
     // 게시글 양방향
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
