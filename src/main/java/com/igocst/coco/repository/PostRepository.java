@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndMemberId(Long postId, Long memberId);
 
-//    void deleteByIdAndMemberId(Long postId, Long memberId);
 }

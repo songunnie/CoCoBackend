@@ -54,6 +54,7 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+
     /**
      * 연관관계 편의 메소드
      */
@@ -80,5 +81,12 @@ public class Post extends Timestamped {
     // 모집 마감 기능
     public void recruitmentEnd() {
         this.state = true;
+    }
+    //주인이 POST
+    //Setter를 쓸 때 코드
+    //addComment로 이미 양방향 매핑이 되어있어서 changeComment 메소드 안써도됨!
+    public void addComment(Comment comment) {
+        comment.setPost(this);
+        comments.add(comment);
     }
 }
