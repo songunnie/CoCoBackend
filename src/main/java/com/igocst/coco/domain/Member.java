@@ -1,6 +1,5 @@
 package com.igocst.coco.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.igocst.coco.domain.timestamped.Timestamped;
 import lombok.*;
 
@@ -53,9 +52,23 @@ public class Member extends Timestamped {
     @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 
+    public void sendMessage(Message message) {
+        this.sendMessage.add(message);
+        if (message.getSender() != this) {
+            message.setSender(this);
+        }
+    }
+
     @OneToMany(mappedBy = "receiver")
     @Builder.Default
-    private List<Message> receiveMessage = new ArrayList<>();
+    private List<Message> readMessage = new ArrayList<>();
+
+    public void readMessage(Message message) {
+        this.readMessage.add(message);
+        if (message.getReceiver() != this) {
+            message.setReceiver(this);
+        }
+    }
 
     /**
      * 연관관계 메소드
