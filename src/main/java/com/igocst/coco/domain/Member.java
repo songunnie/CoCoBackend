@@ -41,16 +41,20 @@ public class Member extends Timestamped {
 
     // 게시글 양방향
     @OneToMany(mappedBy = "member")
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
     // 댓글 양방향
     @OneToMany(mappedBy = "member")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     // 쪽지 양방향
     @OneToMany(mappedBy = "sender")
+    @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver")
+    @Builder.Default
     private List<Message> receiveMessage = new ArrayList<>();
 }

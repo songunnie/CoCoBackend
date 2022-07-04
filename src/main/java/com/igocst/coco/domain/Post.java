@@ -23,6 +23,7 @@ public class Post extends Timestamped {
     @Column(name = "POST_ID")
     private Long id;
 
+    //Json 타입으로 변환하기 이해 fetch타입 Lazy 해제 후 All로!
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID") // 외래키와 매핑
     private Member member;
@@ -53,4 +54,11 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    //주인이 POST
+    //Setter를 쓸 때 코드
+    //addComment로 이미 양방향 매핑이 되어있어서 changeComment 메소드 안써도됨!
+    public void addComment(Comment comment) {
+        comment.setPost(this);
+        comments.add(comment);
+    }
 }
