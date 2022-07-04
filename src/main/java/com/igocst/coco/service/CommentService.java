@@ -2,7 +2,7 @@ package com.igocst.coco.service;
 
 import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Post;
-import com.igocst.coco.dto.*;
+import com.igocst.coco.dto.comment.*;
 import com.igocst.coco.repository.CommentRepository;
 import com.igocst.coco.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

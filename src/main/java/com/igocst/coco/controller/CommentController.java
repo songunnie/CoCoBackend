@@ -1,10 +1,8 @@
 package com.igocst.coco.controller;
 
-import com.igocst.coco.domain.Comment;
-import com.igocst.coco.dto.*;
+import com.igocst.coco.dto.comment.*;
 import com.igocst.coco.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

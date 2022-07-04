@@ -1,4 +1,4 @@
-package com.igocst.coco.dto;
+package com.igocst.coco.dto.comment;
 
 import lombok.*;
 
