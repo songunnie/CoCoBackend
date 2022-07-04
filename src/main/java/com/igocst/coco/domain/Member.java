@@ -48,7 +48,7 @@ public class Member extends Timestamped {
     private List<Comment> comments = new ArrayList<>();
 
     // 쪽지 양방향
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", fetch = FetchType.EAGER)
     @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 

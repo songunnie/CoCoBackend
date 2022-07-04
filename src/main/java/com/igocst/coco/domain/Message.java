@@ -18,7 +18,7 @@ public class Message extends CreateTimestamped {
     private Long id;
 
     // 쪽지 보내는 회원
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member sender;
 
     // 쪽지 받는 회원
