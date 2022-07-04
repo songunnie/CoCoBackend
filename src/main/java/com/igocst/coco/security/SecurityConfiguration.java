@@ -45,6 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/user").permitAll()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/post/list").permitAll()
                 // 이외의 URI는 인증을 거친다.
                 .anyRequest()
                 .authenticated()
