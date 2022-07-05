@@ -4,6 +4,7 @@ import com.igocst.coco.security.filter.JwtAuthenticationFilter;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,6 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 // 아래의 URI는 무조건 인증 통과
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // cors 때문에 추가
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/user").permitAll()
                 .antMatchers("/login").permitAll()

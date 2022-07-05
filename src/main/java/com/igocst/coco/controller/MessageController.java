@@ -2,7 +2,6 @@ package com.igocst.coco.controller;
 
 import com.igocst.coco.dto.message.*;
 import com.igocst.coco.security.MemberDetails;
-import com.igocst.coco.security.jwt.JwtTokenProvider;
 import com.igocst.coco.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
