@@ -1,8 +1,10 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.dto.message.*;
+import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +16,9 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("/message")
-    public MessageCreateResponseDto create(@RequestBody MessageCreateRequestDto messageCreateRequestDto) {
-        return  messageService.join(messageCreateRequestDto);
+    public MessageCreateResponseDto create(@RequestBody MessageCreateRequestDto messageCreateRequestDto,
+                                           @AuthenticationPrincipal MemberDetails memberDetails) {
+        return  messageService.join(messageCreateRequestDto, memberDetails);
     }
 
     @GetMapping("/message/{messageId}")
@@ -24,8 +27,8 @@ public class MessageController {
     }
 
     @GetMapping("/message/list")
-    public List<MessageListReadResponseDto> readMessages() {
-        return messageService.getMessageList();
+    public List<MessageListReadResponseDto> readMessages(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return messageService.getMessageList(memberDetails);
     }
 
     @DeleteMapping("/message/{messageId}")

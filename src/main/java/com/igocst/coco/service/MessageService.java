@@ -5,8 +5,10 @@ import com.igocst.coco.domain.Message;
 import com.igocst.coco.dto.message.*;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.MessageRepository;
+import com.igocst.coco.security.MemberDetails;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,20 +24,15 @@ public class MessageService {
     // 쪽지 보내기
     @Builder
     @Transactional
-    public MessageCreateResponseDto join(MessageCreateRequestDto messageCreateRequestDto) {
+    public MessageCreateResponseDto join(MessageCreateRequestDto messageCreateRequestDto,
+                                         @AuthenticationPrincipal MemberDetails memberDetails) {
 
-        // 샘플(sender)
-        Member member = Member.builder()
-                .email("seri@naver.com")
-                .nickname("seri")
-                .password("1234")
-                .profileImageUrl("lsdkfsld")
-                .build();
+        Member sendMember = memberRepository.findByEmail(memberDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("보내는 사람이 존재하지 않습니다."));
 
         String receiver = messageCreateRequestDto.getReceiver();
         Member receivedMember = memberRepository.findByEmail(receiver)
                 .orElseThrow(() -> new IllegalArgumentException("받는 사람이 존재하지 않습니다."));
-
 
         // message 보내는 코드
         Message message = Message.builder()
@@ -44,7 +41,7 @@ public class MessageService {
                 .content(messageCreateRequestDto.getContent())
                 .build();
 
-        member.sendMessage(message);
+        sendMember.sendMessage(message);
         messageRepository.save(message);
 
         return MessageCreateResponseDto.builder()
@@ -70,8 +67,12 @@ public class MessageService {
 
     // 쪽지 리스트 읽기
     @Transactional
-    public List<MessageListReadResponseDto> getMessageList() {
-        Member member = memberRepository.findById(1L)  // 1번은 샘플
+    public List<MessageListReadResponseDto> getMessageList(
+                                        @AuthenticationPrincipal MemberDetails memberDetails) {
+
+        String readMember = memberDetails.getUsername();
+
+        Member member = memberRepository.findByEmail(readMember)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
         List<Message> messages = member.getReadMessage();
