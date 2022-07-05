@@ -57,25 +57,25 @@ public class JwtTokenProvider {
     private final static String TOKEN_PREFIX = "Bearer ";
 
     // http 요청 헤더에서 JWT 토큰 값 가져오기
-    public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("X-AUTH-TOKEN");
-    }
-
 //    public String resolveToken(HttpServletRequest request) {
-//        String headerValue = request.getHeader(HEADER_AUTHORIZATION);
-//        if (headerValue == null) {
-//            throw new RuntimeException("토큰 정보가 없습니다.");
-//        }
+//        return request.getHeader("X-AUTH-TOKEN");
+//    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String headerValue = request.getHeader(HEADER_AUTHORIZATION);
+        if (headerValue == null) {
+            throw new RuntimeException("토큰 정보가 없습니다.");
+        }
 //
 //        return headerValue;
 
-//        if (!headerValue.startsWith(TOKEN_PREFIX)) {
-//            throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
-//        }
-//
-//        // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
-//        return headerValue.substring(TOKEN_PREFIX.length());
-//    }
+        if (!headerValue.startsWith(TOKEN_PREFIX)) {
+            throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
+        }
+
+        // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
+        return headerValue.substring(TOKEN_PREFIX.length());
+    }
 
     // JWT 토큰 예외 검사
     public static boolean validateToken(String token) {

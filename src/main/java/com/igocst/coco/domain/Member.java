@@ -9,13 +9,15 @@ import java.util.Iterator;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends Timestamped {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
     private Long id;
 
@@ -72,8 +74,14 @@ public class Member extends Timestamped {
 
     /**
      * 연관관계 메소드
-     *
      */
+    // 회원이 작성한 게시글 추가
+    public void addPost(Post post) {
+        post.setMember(this);
+        posts.add(post);
+    }
+
+
     // 회원의 게시글 중에서 특정 게시글 삭제
     public boolean deletePost(Long postId) {
         if (postId <= 0) {
@@ -121,6 +129,35 @@ public class Member extends Timestamped {
             }
         }
         return null;
+    }
+
+    // 회원이 받은 쪽지를 찾는다.
+    public Message findMessage(Long messageId) {
+        if (messageId <= 0) {
+            return null;
+        }
+        for (Message message : readMessage) {
+            if (message.getId() == messageId) {
+                return message;
+            }
+        }
+        return null;
+    }
+
+    // 회원이 받은 쪽지를 삭제한다.
+    public boolean deleteMessage(Long messageId) {
+        if (messageId <= 0) {
+            return false;
+        }
+        // 리스트를 돌아서 해당하는 쪽지 찾는다
+        Iterator<Message> iterator = readMessage.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(messageId)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean deleteComment(Long commentId) {

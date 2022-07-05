@@ -1,13 +1,10 @@
 package com.igocst.coco.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.igocst.coco.domain.timestamped.Timestamped;
 import com.igocst.coco.dto.post.PostUpdateRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +21,8 @@ public class Post extends Timestamped {
     private Long id;
 
     // JSON으로 타입으로 변환하기 위해 fetch타입 LAZY를 해제
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    // cascade = CascadeType.PERSIST 게시글 생성중 잠시 주석처리
+    @ManyToOne()
     @JoinColumn(name = "MEMBER_ID") // 외래키와 매핑
     private Member member;
 
