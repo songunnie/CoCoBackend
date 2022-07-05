@@ -85,6 +85,7 @@ public class MessageService {
         List<MessageListReadResponseDto> messageList = new ArrayList<>();
         for (Message m : messages) {
             messageList.add(MessageListReadResponseDto.builder()
+                    .id(m.getId())
                     .title(m.getTitle())
                     .sender(m.getSender().getEmail())
                     .status("쪽지 리스트를 불러오는데 성공했습니다.")

@@ -1,9 +1,11 @@
 package com.igocst.coco.controller;
 
+import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.comment.*;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,5 +39,12 @@ public class CommentController {
     public CommentDeleteResponseDto deleteComment(@PathVariable Long comment_id,
                                                   @AuthenticationPrincipal MemberDetails memberDetails){
         return commentService.deleteComment(comment_id, memberDetails); //.removeCommentById? vs removeComment
+    }
+
+    // 관리자, 댓글 삭제
+    @Secured(MemberRole.Authority.ADMIN)
+    @DeleteMapping("/admin/comment/{commentId}")
+    public CommentDeleteResponseDto adminDeletePost(@PathVariable Long commentId) {
+        return commentService.adminDeleteComment(commentId);
     }
 }

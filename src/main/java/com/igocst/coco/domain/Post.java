@@ -48,8 +48,8 @@ public class Post extends Timestamped {
     @Enumerated(EnumType.STRING)
     private MeetingType meetingType;
 
-    // 댓글 양방향
-    @OneToMany(mappedBy = "post")
+    // 댓글 양방향, 게시글이 삭제되면, 댓글도 같이 삭제
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
 

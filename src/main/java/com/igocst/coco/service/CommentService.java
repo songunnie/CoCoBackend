@@ -121,4 +121,13 @@ public class CommentService {
                 .status("댓글이 삭제되었습니다.")
                 .build();
     }
+
+    // 관리자, 댓글 삭제
+    public CommentDeleteResponseDto adminDeleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
+
+        return CommentDeleteResponseDto.builder()
+                .id(commentId)
+                .build();
+    }
 }

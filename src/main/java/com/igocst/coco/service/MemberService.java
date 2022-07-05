@@ -3,10 +3,7 @@ package com.igocst.coco.service;
 
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
-import com.igocst.coco.dto.member.LoginRequestDto;
-import com.igocst.coco.dto.member.LoginResponseDto;
-import com.igocst.coco.dto.member.RegisterRequestDto;
-import com.igocst.coco.dto.member.RegisterResponseDto;
+import com.igocst.coco.dto.member.*;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -80,4 +77,13 @@ public class MemberService {
     }
 
     // 회원 정보 수정
+
+    // 관리자, 회원 강제 탈퇴
+    public MemberDeleteResponseDto adminDeleteMember(Long userId) {
+        memberRepository.deleteById(userId);
+
+        return MemberDeleteResponseDto.builder()
+                .status("200")
+                .build();
+    }
 }

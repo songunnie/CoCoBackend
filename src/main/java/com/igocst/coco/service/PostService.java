@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -31,14 +32,6 @@ public class PostService {
         Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 회원 ID가 업습니다.")
         );
-
-        // 샘플
-//        Member member = Member.builder()
-//                .email("19@naver.com")
-//                .nickname("19")
-//                .password("1234")
-//                .profileImageUrl("ksdjfhasdfhal")
-//                .build();
 
         Post post = Post.builder()
                 .title(postSaveRequestDto.getTitle())
@@ -113,12 +106,6 @@ public class PostService {
         Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
                 () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
         );
-//        Long memberId = member.getId();
-
-        // 1. 해당 postId와 로그인된 사용자가 작성한 게시글을 가져온다.
-//        Post findPost = postRepository.findByIdAndMemberId(postId, memberId).orElseThrow(
-//                () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-//        );
 
         // Member와 Post는 연관관계가 맺어져 있으므로, Member에 Post가 있다
         // 1. 로그인된 회원의 게시글 목록에서 수정할 postId의 게시글을 찾아온다.
@@ -129,9 +116,6 @@ public class PostService {
 
         // 2. 가져온 Post를 requestDto로 값을 바꿔준다.
         findPost.updatePost(requestDto);
-
-        // @Transactional 붙였는데 왜 업데이트 안 되는지?
-//        postRepository.save(findPost);
 
         return PostUpdateResponseDto.builder()
                 .status("200")
@@ -169,12 +153,7 @@ public class PostService {
         Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
                 () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
         );
-//        Long memberId = member.getId();
 
-        // 1. 해당 postId와 로그인된 사용자가 작성한 게시글을 가져온다.
-//        Post findPost = postRepository.findByIdAndMemberId(postId, memberId).orElseThrow(
-//                () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-//        );
         Post findPost = member.findPost(postId);
         if (findPost == null) {
             throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
@@ -184,6 +163,32 @@ public class PostService {
         findPost.recruitmentEnd();
 
         return RecruitmentEndResponseDto.builder()
+                .status("200")
+                .build();
+    }
+
+    // 관리자, 게시글 삭제 기능
+    @Transactional
+    public PostDeleteResponseDto adminDeletePost(Long postId) {
+
+        /**
+         * 관리자가 임의로 게시글을 삭제한다.
+         * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
+        */
+        Post findPost = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        );
+//
+        Member member = findPost.getMember();
+        boolean isValid = member.deletePost(postId);
+
+        if(!isValid) {
+            throw new RuntimeException("삭제할 수 없습니다.");
+        }
+
+        postRepository.deleteById(postId);
+
+        return PostDeleteResponseDto.builder()
                 .status("200")
                 .build();
     }

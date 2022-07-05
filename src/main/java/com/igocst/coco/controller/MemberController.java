@@ -1,20 +1,14 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
-import com.igocst.coco.dto.member.LoginRequestDto;
-import com.igocst.coco.dto.member.LoginResponseDto;
-import com.igocst.coco.dto.member.RegisterRequestDto;
-import com.igocst.coco.dto.member.RegisterResponseDto;
+import com.igocst.coco.dto.member.*;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,5 +48,12 @@ public class MemberController {
         String nickname = memberDetails.getNickname();
         System.out.println(nickname);
         return nickname;
+    }
+
+    // 관리자, 회원 강제 탈퇴
+    @Secured(MemberRole.Authority.ADMIN)
+    @DeleteMapping("/admin/user/{userId}")
+    public MemberDeleteResponseDto adminDeleteUser(@PathVariable Long userId) {
+        return memberService.adminDeleteMember(userId);
     }
 }
