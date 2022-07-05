@@ -22,8 +22,9 @@ public class MessageController {
     }
 
     @GetMapping("/message/{messageId}")
-    public MessageReadResponseDto readMessage(@PathVariable Long messageId) {
-        return messageService.getMessage(messageId);
+    public MessageReadResponseDto readMessage(@PathVariable Long messageId,
+                                              @AuthenticationPrincipal MemberDetails memberDetails) {
+        return messageService.getMessage(messageId, memberDetails);
     }
 
     @GetMapping("/message/list")
@@ -32,8 +33,9 @@ public class MessageController {
     }
 
     @DeleteMapping("/message/{messageId}")
-    public MessageDeleteResponseDto find(@PathVariable Long messageId) {
-        return messageService.deleteMessage(messageId);
+    public MessageDeleteResponseDto find(@PathVariable Long messageId,
+                                         @AuthenticationPrincipal MemberDetails memberDetails) {
+        return messageService.deleteMessage(messageId, memberDetails);
     }
 }
 
