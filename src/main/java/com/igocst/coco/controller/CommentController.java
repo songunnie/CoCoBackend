@@ -1,8 +1,10 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.dto.comment.*;
+import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +16,9 @@ public class CommentController {
 
     @PostMapping("/comment/{post_id}")
     public CommentCreateResponseDto createComment(@RequestBody CommentCreateRequestDto commentCreateRequestDto,
-                                                  @PathVariable Long post_id) {
-        return commentService.join(commentCreateRequestDto, post_id);
+                                                  @PathVariable Long post_id,
+                                                  @AuthenticationPrincipal MemberDetails memberDetails) {
+        return commentService.join(commentCreateRequestDto, post_id, memberDetails);
     }
 
     @GetMapping("/comment/list/{post_id}")
@@ -23,13 +26,16 @@ public class CommentController {
         return commentService.readCommentList(post_id);
     }
 
-    @PutMapping("/comment/{post_id}")
-    public CommentUpdateResponseDto updateComment(@PathVariable Long post_id, @RequestBody CommentUpdateRequestDto commentUpdateRequestDto) {
-        return commentService.updateComment(commentUpdateRequestDto, post_id);
+    @PutMapping("/comment/{comment_id}")
+    public CommentUpdateResponseDto updateComment(@RequestBody CommentUpdateRequestDto commentUpdateRequestDto,
+                                                  @PathVariable Long comment_id,
+                                                  @AuthenticationPrincipal MemberDetails memberDetails) {
+        return commentService.updateComment(commentUpdateRequestDto, comment_id, memberDetails);
     }
 
     @DeleteMapping("/comment/{comment_id}")
-    public CommentDeleteResponseDto deleteComment(@PathVariable Long comment_id){
-        return commentService.deleteComment(comment_id); //.removeCommentById? vs removeComment
+    public CommentDeleteResponseDto deleteComment(@PathVariable Long comment_id,
+                                                  @AuthenticationPrincipal MemberDetails memberDetails){
+        return commentService.deleteComment(comment_id, memberDetails); //.removeCommentById? vs removeComment
     }
 }

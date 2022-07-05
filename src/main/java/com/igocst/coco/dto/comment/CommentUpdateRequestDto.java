@@ -9,6 +9,5 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class CommentUpdateRequestDto {
-//    private Long id;
     private String content;
 }

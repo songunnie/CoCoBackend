@@ -10,4 +10,5 @@ import lombok.Setter;
 @Getter
 public class CommentDeleteResponseDto {
     private Long id;
+    private String status;
 }

@@ -10,6 +10,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CommentCreateResponseDto {
-    private Long id;
     private String status;
 }
