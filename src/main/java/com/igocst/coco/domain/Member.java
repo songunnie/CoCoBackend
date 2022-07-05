@@ -9,13 +9,15 @@ import java.util.Iterator;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends Timestamped {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
     private Long id;
 
@@ -38,7 +40,7 @@ public class Member extends Timestamped {
     private MemberRole role;
 
     // 게시글 양방향
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "member")
     @Builder.Default    // 빌더를 클래스레벨에 달아놔서 초기화 위해 필요, 생성자에 빌더를 달면 안써도 됨
     private List<Post> posts = new ArrayList<>();
 
@@ -48,7 +50,7 @@ public class Member extends Timestamped {
     private List<Comment> comments = new ArrayList<>();
 
     // 쪽지 양방향
-    @OneToMany(mappedBy = "sender", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "sender")
     @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 
@@ -72,7 +74,6 @@ public class Member extends Timestamped {
 
     /**
      * 연관관계 메소드
-     *
      */
     // 회원이 작성한 게시글 추가
     public void addPost(Post post) {
@@ -115,5 +116,34 @@ public class Member extends Timestamped {
 //            }
 //        }
 //        return null;
+    }
+
+    // 회원이 받은 쪽지를 찾는다.
+    public Message findMessage(Long messageId) {
+        if (messageId <= 0) {
+            return null;
+        }
+        for (Message message : readMessage) {
+            if (message.getId() == messageId) {
+                return message;
+            }
+        }
+        return null;
+    }
+
+    // 회원이 받은 쪽지를 삭제한다.
+    public boolean deleteMessage(Long messageId) {
+        if (messageId <= 0) {
+            return false;
+        }
+        // 리스트를 돌아서 해당하는 쪽지 찾는다
+        Iterator<Message> iterator = readMessage.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(messageId)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 }

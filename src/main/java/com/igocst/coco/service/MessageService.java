@@ -52,9 +52,15 @@ public class MessageService {
 
     // 쪽지 상세 읽기
     @Transactional
-    public MessageReadResponseDto getMessage(Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지가 존재하지 않습니다."));
+    public MessageReadResponseDto getMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
+
+        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
+
+        Message message = member.findMessage(messageId);
+        if (message == null) {
+            throw new RuntimeException("쪽지에 대한 권한이 없습니다.");
+        }
 
         return MessageReadResponseDto.builder()
                 .sender(message.getSender().getEmail())
@@ -67,13 +73,12 @@ public class MessageService {
 
     // 쪽지 리스트 읽기
     @Transactional
-    public List<MessageListReadResponseDto> getMessageList(
-                                        @AuthenticationPrincipal MemberDetails memberDetails) {
+    public List<MessageListReadResponseDto> getMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
 
         String readMember = memberDetails.getUsername();
 
         Member member = memberRepository.findByEmail(readMember)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
 
         List<Message> messages = member.getReadMessage();
 
@@ -91,11 +96,18 @@ public class MessageService {
 
     // 쪽지 삭제
     @Transactional
-    public MessageDeleteResponseDto deleteMessage(Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 쪽지가 존재하지 않습니다."));
+    public MessageDeleteResponseDto deleteMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
 
-        messageRepository.delete(message);
+        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
+
+        boolean isValid = member.deleteMessage(messageId);
+
+        if (!isValid) {
+            throw new RuntimeException("쪽지를 삭제할 수 있는 권한이 없습니다.");
+        }
+
+        messageRepository.deleteById(messageId);
 
         return MessageDeleteResponseDto.builder()
                 .messageId(messageId)
