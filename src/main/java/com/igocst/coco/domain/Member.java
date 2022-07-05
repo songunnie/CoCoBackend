@@ -39,18 +39,18 @@ public class Member extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
-    // 게시글 양방향
-    @OneToMany(mappedBy = "member")
+    // 게시글 양방향, 회원이 삭제되면, 게시글도 같이 삭제
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     @Builder.Default    // 빌더를 클래스레벨에 달아놔서 초기화 위해 필요, 생성자에 빌더를 달면 안써도 됨
     private List<Post> posts = new ArrayList<>();
 
-    // 댓글 양방향
-    @OneToMany(mappedBy = "member")
+    // 댓글 양방향, 회원이 삭제되면, 댓글도 같이 삭제
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
-    // 쪽지 양방향
-    @OneToMany(mappedBy = "sender")
+    // 쪽지 양방향, 회원이 삭제되면, 쪽지(발송한 쪽지)도 같이 삭제
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Message> sendMessage = new ArrayList<>();
 
@@ -61,7 +61,8 @@ public class Member extends Timestamped {
         }
     }
 
-    @OneToMany(mappedBy = "receiver")
+    // 회원이 삭제되면, 쪽지(수신한 쪽지)도 같이 삭제
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Message> readMessage = new ArrayList<>();
 
@@ -88,10 +89,17 @@ public class Member extends Timestamped {
             return false;
         }
         // 리스트를 돌아서 해당하는 게시글을 찾는다
-        Iterator<Post> iterator = posts.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().getId().equals(postId)) {
-                iterator.remove();
+//        Iterator<Post> iterator = posts.iterator();
+//        while (iterator.hasNext()) {
+//            if (iterator.next().getId().equals(postId)) {
+//                iterator.remove();
+//                return true;
+//            }
+//        }
+//        return false;
+        for (Post post : posts) {
+            if (post.getId() == postId){
+                posts.remove(post);
                 return true;
             }
         }
