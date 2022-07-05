@@ -80,7 +80,9 @@ public class Post extends Timestamped {
     public void recruitmentEnd() {
         this.state = true;
     }
-    //주인이 POST
+
+
+    //댓글의 주인이 POST
     //Setter를 쓸 때 코드
     //addComment로 이미 양방향 매핑이 되어있어서 changeComment 메소드 안써도됨!
     public void addComment(Comment comment) {

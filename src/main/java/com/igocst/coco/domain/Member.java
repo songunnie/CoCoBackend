@@ -109,13 +109,26 @@ public class Member extends Timestamped {
             }
         }
         return null;
-//        Iterator<Post> iterator = posts.iterator();
-//        while (iterator.hasNext()) {
-//            if (iterator.next().getId().equals(postId)) {
-//                return iterator.next();
-//            }
-//        }
-//        return null;
+    }
+
+    // 연관관계 메소드 / 댓글 - 회원
+    // member와 comment의 연관관계 메소드
+    public void addComment(Comment comment) {
+        comment.setMember(this);
+        comments.add(comment);
+    }
+
+    //회원이 작성한 댓글 찾기
+    public Comment findComment(Long commentId) {
+        if (commentId <= 0) {
+            return null;
+        }
+        for (Comment comment : comments) {
+            if (comment.getId() == commentId) {
+                return comment;
+            }
+        }
+        return null;
     }
 
     // 회원이 받은 쪽지를 찾는다.
@@ -146,4 +159,20 @@ public class Member extends Timestamped {
         }
         return false;
     }
+
+    public boolean deleteComment(Long commentId) {
+        if (commentId <= 0) {
+            return false;
+        }
+        // 리스트를 돌아서 해당하는 게시글을 찾는다
+        Iterator<Comment> iterator = comments.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(commentId)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

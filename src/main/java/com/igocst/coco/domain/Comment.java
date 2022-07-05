@@ -31,6 +31,11 @@ public class Comment extends Timestamped {
     @Column(nullable = false)
     private String content;
 
+    public void addMember(Member member) {
+        this.member = member;
+        member.getComments().add(this);
+    }
+
     //Comment에서 하면 동작은 하지만 두번 타는 코드를 짜게된다.
 //    public void changePost(Post post) {
 //        this.post = post;
