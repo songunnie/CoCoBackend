@@ -40,11 +40,11 @@ public class MemberController {
 
     // test, 요청이 성공하면 시큐리티 필터를 통과했다는 의미, MemberDetails = 인증(로그인)된 사용자
     @GetMapping("/user/test")
-    public String tokenTest(HttpServletRequest request,
-                            @AuthenticationPrincipal MemberDetails memberDetails) {
-        String token = request.getHeader("X-AUTH-TOKEN");
-        System.out.println(memberDetails.getUsername());
-        return JwtTokenProvider.getMemberEmailFromToken(token);
+    public String tokenTest(@AuthenticationPrincipal MemberDetails memberDetails) {
+//        String token = request.getHeader("X-AUTH-TOKEN");
+        String username = memberDetails.getUsername();
+        System.out.println(username);
+        return username;
     }
 
     // test, 관리자만 사용할 수 있는 URL

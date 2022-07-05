@@ -38,7 +38,7 @@ public class Member extends Timestamped {
     private MemberRole role;
 
     // 게시글 양방향
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     @Builder.Default    // 빌더를 클래스레벨에 달아놔서 초기화 위해 필요, 생성자에 빌더를 달면 안써도 됨
     private List<Post> posts = new ArrayList<>();
 
@@ -74,6 +74,13 @@ public class Member extends Timestamped {
      * 연관관계 메소드
      *
      */
+    // 회원이 작성한 게시글 추가
+    public void addPost(Post post) {
+        post.setMember(this);
+        posts.add(post);
+    }
+
+
     // 회원의 게시글 중에서 특정 게시글 삭제
     public boolean deletePost(Long postId) {
         if (postId <= 0) {
@@ -95,12 +102,18 @@ public class Member extends Timestamped {
         if (postId <= 0) {
             return null;
         }
-        Iterator<Post> iterator = posts.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().getId().equals(postId)) {
-                return iterator.next();
+        for (Post post : posts) {
+            if (post.getId() == postId) {
+                return post;
             }
         }
         return null;
+//        Iterator<Post> iterator = posts.iterator();
+//        while (iterator.hasNext()) {
+//            if (iterator.next().getId().equals(postId)) {
+//                return iterator.next();
+//            }
+//        }
+//        return null;
     }
 }
