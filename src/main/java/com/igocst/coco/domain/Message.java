@@ -1,9 +1,9 @@
 package com.igocst.coco.domain;
 
-import com.igocst.coco.domain.timestamped.CreateTimestamped;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Message extends CreateTimestamped {
+public class Message {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MESSAGE_ID")
@@ -33,5 +33,8 @@ public class Message extends CreateTimestamped {
 
     @Column(nullable = false)
     private boolean readState;
+
+    @Column(nullable = false)
+    private LocalDateTime createDate;
 
 }

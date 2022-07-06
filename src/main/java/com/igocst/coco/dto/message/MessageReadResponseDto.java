@@ -10,4 +10,5 @@ public class MessageReadResponseDto {
     private String title;
     private String content;
     private String status;
+    private boolean readState;
 }
