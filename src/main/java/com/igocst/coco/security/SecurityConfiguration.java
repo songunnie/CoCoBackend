@@ -37,6 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.headers().frameOptions().disable();
 
+        // TODO: permitAll을 하면 /user를 사용하는 모든 사람들에게 모든걸 허용해준 것! 다시 한번 살펴보기
         // JWT 사용 위해 세션 안씀
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -54,6 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin().disable()
                 // JWT 필터를 추가, 요청이 올때마다 JWT 토큰을 검사한다.
+                // JwtAuthenticationFilter(jwtTokenProvider) 의미 알아볼 것!
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

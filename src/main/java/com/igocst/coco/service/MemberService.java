@@ -1,14 +1,24 @@
 package com.igocst.coco.service;
 
 
+import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
+import com.igocst.coco.dto.comment.CommentReadResponseDto;
+import com.igocst.coco.dto.comment.CommentUpdateRequestDto;
+import com.igocst.coco.dto.comment.CommentUpdateResponseDto;
 import com.igocst.coco.dto.member.*;
+import com.igocst.coco.dto.message.MessageReadResponseDto;
 import com.igocst.coco.repository.MemberRepository;
+import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +86,44 @@ public class MemberService {
                 .build();
     }
 
+    //회원 정보 획득
+    public MemberReadResponseDto readMember(MemberDetails memberDetails) {
+        Member member = memberRepository.findById(memberDetails.getMember().getId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+        
+        return MemberReadResponseDto.builder()
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .githubUrl(member.getGithubUrl())
+                .portfolioUrl(member.getPortfolioUrl())
+                .introduction(member.getIntroduction())
+                .status("회원 정보 불러오기 완료")
+                .build();
+    }
+
     // 회원 정보 수정
+    @Transactional
+    public MemberUpdateResponseDto updateMember(MemberUpdateRequestDto memberUpdateRequestDto,
+                                                MemberDetails memberDetails) {
+        //멤버를 찾고
+        Member member = memberRepository.findById(memberDetails.getMember().getId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+
+        if (member == null) {
+            throw new RuntimeException("프로필 수정 권한이 없습니다.");
+        }
+        
+        // TODO: password 수정하려면 기존 비번 확인하는거 필요, imageUrl도 추가해야함.
+        //그 멤버의 정보를 바꾼다.
+        member.updateNickname(memberUpdateRequestDto.getNickname());
+        member.updateGithubUrl(memberUpdateRequestDto.getGithubUrl());
+        member.updatePortfolioUrl(memberUpdateRequestDto.getPortfolioUrl());
+        member.updateIntroduction(memberUpdateRequestDto.getIntroduction());
+
+        return MemberUpdateResponseDto.builder()
+                .status("회원 정보가 수정되었습니다")
+                .build();
+    }
 
     // 관리자, 회원 강제 탈퇴
     public MemberDeleteResponseDto adminDeleteMember(Long userId) {
