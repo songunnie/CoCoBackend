@@ -2,6 +2,7 @@ package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
 import lombok.*;
+import org.hibernate.annotations.common.reflection.XMember;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -183,4 +184,18 @@ public class Member extends Timestamped {
         return false;
     }
 
+    // 회원정보 수정
+    public void updateNickname(String nickname){ this.nickname = nickname; }
+
+    public void updateGithubUrl(String githubUrl){
+        this.githubUrl = githubUrl;
+    }
+
+    public void updatePortfolioUrl(String portfolioUrl){
+        this.portfolioUrl = portfolioUrl;
+    }
+
+    public void updateIntroduction(String introduction){
+        this.introduction = introduction;
+    }
 }

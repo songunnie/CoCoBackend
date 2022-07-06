@@ -1,6 +1,8 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
+import com.igocst.coco.dto.comment.CommentUpdateRequestDto;
+import com.igocst.coco.dto.comment.CommentUpdateResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
@@ -39,6 +41,18 @@ public class MemberController {
         String username = memberDetails.getUsername();
         System.out.println(username);
         return username;
+    }
+
+    //회원 정보 획득
+    @GetMapping("/user")
+    public MemberReadResponseDto readMember(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.readMember(memberDetails);
+    }
+    //회원 정보 수정
+    @PutMapping("/user")
+    public MemberUpdateResponseDto updateMember(@RequestBody MemberUpdateRequestDto memberUpdateRequestDto,
+                                                @AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
 
     // test, 관리자만 사용할 수 있는 URL
