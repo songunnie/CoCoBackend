@@ -1,8 +1,6 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
-import com.igocst.coco.dto.comment.CommentUpdateRequestDto;
-import com.igocst.coco.dto.comment.CommentUpdateResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
@@ -12,7 +10,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,6 +51,14 @@ public class MemberController {
                                                 @AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
+
+    // 회원 탈퇴
+    @DeleteMapping("/user/{userId}")
+    public MemberDeleteResponseDto deleteMember(@PathVariable Long userId,
+                                                 @AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.deleteMember(userId, memberDetails);
+    }
+
 
     // test, 관리자만 사용할 수 있는 URL
     @Secured(MemberRole.Authority.ADMIN)

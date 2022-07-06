@@ -2,7 +2,6 @@ package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
 import lombok.*;
-import org.hibernate.annotations.common.reflection.XMember;
 
 import javax.persistence.*;
 import java.util.ArrayList;

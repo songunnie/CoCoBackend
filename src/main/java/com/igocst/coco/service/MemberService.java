@@ -8,6 +8,7 @@ import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.comment.CommentUpdateRequestDto;
 import com.igocst.coco.dto.comment.CommentUpdateResponseDto;
 import com.igocst.coco.dto.member.*;
+import com.igocst.coco.dto.message.MessageDeleteResponseDto;
 import com.igocst.coco.dto.message.MessageReadResponseDto;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.security.MemberDetails;
@@ -124,6 +125,30 @@ public class MemberService {
                 .status("회원 정보가 수정되었습니다")
                 .build();
     }
+
+    // 회원 탈퇴
+    @Transactional
+    public MemberDeleteResponseDto deleteMember(Long userId, MemberDetails memberDetails) {
+        Member member = memberRepository.findById(memberDetails.getMember().getId())
+                .orElseThrow(() -> new IllegalArgumentException("회원이 아닙니다."));
+
+        if (member == null) {
+            throw new NullPointerException("회원이 아닙니다.");
+        }
+
+        if (member.getId() != userId) {  // 예외처리를 이정도로 해줘야 하는지, 안해도 되는건지 모르겠음.
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
+        memberRepository.deleteById(userId);
+
+        return MemberDeleteResponseDto.builder()
+                .userId(userId)
+                .status("회원 탈퇴했습니다.")
+                .build();
+    }
+
+
 
     // 관리자, 회원 강제 탈퇴
     public MemberDeleteResponseDto adminDeleteMember(Long userId) {
