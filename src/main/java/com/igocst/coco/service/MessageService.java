@@ -24,8 +24,7 @@ public class MessageService {
     // 쪽지 보내기
     @Builder
     @Transactional
-    public MessageCreateResponseDto join(MessageCreateRequestDto messageCreateRequestDto,
-                                         @AuthenticationPrincipal MemberDetails memberDetails) {
+    public MessageCreateResponseDto join(MessageCreateRequestDto messageCreateRequestDto, MemberDetails memberDetails) {
 
         Member sendMember = memberRepository.findByEmail(memberDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("보내는 사람이 존재하지 않습니다."));
@@ -39,6 +38,7 @@ public class MessageService {
                 .receiver(receivedMember)
                 .title(messageCreateRequestDto.getTitle())
                 .content(messageCreateRequestDto.getContent())
+                .createDate(messageCreateRequestDto.getCreateDate())
                 .build();
 
         sendMember.sendMessage(message);
@@ -52,7 +52,7 @@ public class MessageService {
 
     // 쪽지 상세 읽기
     @Transactional
-    public MessageReadResponseDto getMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
+    public MessageReadResponseDto getMessage(Long messageId, MemberDetails memberDetails) {
 
         Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
@@ -62,10 +62,13 @@ public class MessageService {
             throw new RuntimeException("쪽지에 대한 권한이 없습니다.");
         }
 
+        message.setReadState(true);
+
         return MessageReadResponseDto.builder()
                 .sender(message.getSender().getEmail())
                 .title(message.getTitle())
                 .content(message.getContent())
+                .readState(message.isReadState())
                 .status("쪽지를 불러오는데 성공했습니다.")
                 .build();
     }
@@ -88,6 +91,8 @@ public class MessageService {
                     .id(m.getId())
                     .title(m.getTitle())
                     .sender(m.getSender().getEmail())
+                    .readState(m.isReadState())
+                    .createDate(m.getCreateDate())
                     .status("쪽지 리스트를 불러오는데 성공했습니다.")
                     .build());
         }
