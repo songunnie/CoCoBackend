@@ -38,8 +38,9 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String contact;
 
+    // TODO: 모집 완료 = true, 모집 중 = false ?
     @Column(nullable = false)
-    private boolean state;
+    private boolean recruitmentState;
 
     @Column(nullable = false)
     private int hits;
@@ -72,16 +73,11 @@ public class Post extends Timestamped {
     public void updatePost(PostUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
+        this.recruitmentState = requestDto.isState();
         this.meetingType = requestDto.getMeetingType();
         this.period = requestDto.getPeriod();
         this.contact = requestDto.getContact();
     }
-
-    // 모집 마감 기능
-    public void recruitmentEnd() {
-        this.state = true;
-    }
-
 
     //댓글의 주인이 POST
     //Setter를 쓸 때 코드

@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter @Setter
 public class PostUpdateRequestDto {
     private String title;
+    private boolean recruitmentState;
     private String content;
     private MeetingType meetingType;
     private String contact;

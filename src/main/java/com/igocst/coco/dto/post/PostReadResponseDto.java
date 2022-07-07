@@ -19,7 +19,7 @@ public class PostReadResponseDto {
     private MeetingType meetingType;
     private String contact;
     private String period;
-    private boolean state;
+    private boolean recruitmentState;
     private int hits;
     private LocalDateTime postDate;
     private String writer;  // 글 작성자 닉네임

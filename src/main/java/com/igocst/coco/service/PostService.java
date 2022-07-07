@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -67,14 +66,14 @@ public class PostService {
                 .meetingType(findPost.getMeetingType())
                 .contact(findPost.getContact())
                 .period(findPost.getPeriod())
-                .state(findPost.isState())
+                .state(findPost.isRecruitmentState())
                 .hits(findPost.getHits())
                 .postDate(findPost.getLastModifiedDate())
                 .writer(findPost.getMember().getNickname())
                 .build();
     }
 
-    // 게시글 목록 조회
+    // 게시글 목록 전체 조회
     public List<PostReadResponseDto> readPostList() {
         // 1. 게시글을 다 가져온다
         List<Post> posts = postRepository.findAll();
@@ -90,7 +89,7 @@ public class PostService {
                     .meetingType(post.getMeetingType())
                     .contact(post.getContact())
                     .period(post.getPeriod())
-                    .state(post.isState())
+                    .state(post.isRecruitmentState())
                     .hits(post.getHits())
                     .postDate(post.getLastModifiedDate())
                     .writer(post.getMember().getNickname())
@@ -98,6 +97,30 @@ public class PostService {
             );
         }
         return postList;
+    }
+
+    // 게시글 목록 조회 (모집 중인거만)
+    public List<PostReadResponseDto> readRecruitingPostList() {
+        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateTrue();
+
+        List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
+        for (Post post : recrutingPosts) {
+            recrutingPostList.add(PostReadResponseDto.builder()
+                    .status("200")
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .state(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getLastModifiedDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return recrutingPostList;
     }
 
 //  게시글 수정
@@ -146,28 +169,6 @@ public class PostService {
         postRepository.deleteById(postId);
 
         return PostDeleteResponseDto.builder()
-                .status("200")
-                .build();
-    }
-
-    // TODO: 모집 마감을 했을 때, 수정 날짜가 업데이트 될 텐데, 모집 마감된 게시글이 끌올되는 거 어떻게 처리할건지?
-    // 모집 마감 기능
-    @Transactional
-    public RecruitmentEndResponseDto recruitmentEnd(Long postId, MemberDetails memberDetails) {
-        // 로그인된 사용자 정보가 필요
-        Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
-                () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
-        );
-
-        Post findPost = member.findPost(postId);
-        if (findPost == null) {
-            throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
-        }
-
-        // 2. 모집을 마감 ( false -> true )
-        findPost.recruitmentEnd();
-
-        return RecruitmentEndResponseDto.builder()
                 .status("200")
                 .build();
     }
