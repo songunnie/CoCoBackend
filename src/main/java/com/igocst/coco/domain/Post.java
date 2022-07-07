@@ -53,8 +53,6 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-
-
     /**
      * 연관관계 편의 메소드
      */
@@ -73,7 +71,7 @@ public class Post extends Timestamped {
     public void updatePost(PostUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
-        this.recruitmentState = requestDto.isState();
+        this.recruitmentState = requestDto.isRecruitmentState();
         this.meetingType = requestDto.getMeetingType();
         this.period = requestDto.getPeriod();
         this.contact = requestDto.getContact();
