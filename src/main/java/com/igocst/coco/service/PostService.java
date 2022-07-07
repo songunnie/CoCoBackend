@@ -61,6 +61,7 @@ public class PostService {
 
         return PostReadResponseDto.builder()
                 .status("200")
+                .id(findPost.getId())
                 .title(findPost.getTitle())
                 .content(findPost.getContent())
                 .meetingType(findPost.getMeetingType())
@@ -68,6 +69,7 @@ public class PostService {
                 .period(findPost.getPeriod())
                 .state(findPost.isState())
                 .hits(findPost.getHits())
+                .postDate(findPost.getLastModifiedDate())
                 .writer(findPost.getMember().getNickname())
                 .build();
     }
@@ -82,6 +84,7 @@ public class PostService {
         for (Post post : posts) {
             postList.add(PostReadResponseDto.builder()
                     .status("200")
+                    .id(post.getId())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .meetingType(post.getMeetingType())
@@ -89,6 +92,7 @@ public class PostService {
                     .period(post.getPeriod())
                     .state(post.isState())
                     .hits(post.getHits())
+                    .postDate(post.getLastModifiedDate())
                     .writer(post.getMember().getNickname())
                     .build()
             );
@@ -146,6 +150,7 @@ public class PostService {
                 .build();
     }
 
+    // TODO: 모집 마감을 했을 때, 수정 날짜가 업데이트 될 텐데, 모집 마감된 게시글이 끌올되는 거 어떻게 처리할건지?
     // 모집 마감 기능
     @Transactional
     public RecruitmentEndResponseDto recruitmentEnd(Long postId, MemberDetails memberDetails) {

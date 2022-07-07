@@ -53,6 +53,7 @@ public class Post extends Timestamped {
     private List<Comment> comments = new ArrayList<>();
 
 
+
     /**
      * 연관관계 편의 메소드
      */
