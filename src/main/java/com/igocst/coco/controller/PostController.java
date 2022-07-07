@@ -38,6 +38,12 @@ public class PostController {
         return postService.readPostList();
     }
 
+    // 모집 중인 게시글 목록 조회
+    @GetMapping("/post/recruit/list")
+    public List<PostReadResponseDto> readRecruitingPostList() {
+        return postService.readRecruitingPostList();
+    }
+
     // 게시글 수정
     @PutMapping("/post/{postId}")
     public PostUpdateResponseDto updatePost(@PathVariable Long postId,
@@ -51,13 +57,6 @@ public class PostController {
     public PostDeleteResponseDto deletePost(@PathVariable Long postId,
                                             @AuthenticationPrincipal MemberDetails memberDetails) {
         return postService.deletePost(postId, memberDetails);
-    }
-
-    // 모집 마감
-    @PutMapping("/post/close/{postId}")
-    public RecruitmentEndResponseDto recruitmentEnd(@PathVariable Long postId,
-                                                    @AuthenticationPrincipal MemberDetails memberDetails) {
-        return postService.recruitmentEnd(postId, memberDetails);
     }
 
     // 관리자, 게시글 삭제
