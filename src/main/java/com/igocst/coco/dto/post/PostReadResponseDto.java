@@ -23,4 +23,7 @@ public class PostReadResponseDto {
     private int hits;
     private LocalDateTime postDate;
     private String writer;  // 글 작성자 닉네임
+    // 게시글을 수정,삭제 할 수 있는지 여부 체크
+    private boolean enableUpdate;
+    private boolean enableDelete;
 }
