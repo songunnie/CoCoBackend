@@ -103,7 +103,7 @@ public class PostService {
 
     // 게시글 목록 조회 (모집 중인거만)
     public List<PostReadResponseDto> readRecruitingPostList() {
-        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateTrue();
+        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalse();
 
         List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
         for (Post post : recrutingPosts) {
