@@ -51,12 +51,20 @@ public class PostService {
     }
 
     // 게시글 내용(상세) 조회
-    public PostReadResponseDto readPost(Long postId) {
+    public PostReadResponseDto readPost(Long postId, MemberDetails memberDetails) {
         // 로그인된 사용자의 정보가 필요 (로그인된 사용자가 아니면 접근 불가, JWT로 인증이 안되면 접근 불가)
 
         // 1. postId에 해당하는 게시글 조회
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        boolean enableUpdate = false;
+        boolean enableDelete = false;
+
+        // 2. 현재 로그인한 회원이 해당 게시글을 작성한 회원이 맞다면 수정, 삭제 가능
+        if (memberDetails.getMember().getId() == findPost.getMember().getId()) {
+            enableUpdate = true;
+            enableDelete = true;
+        }
 
         return PostReadResponseDto.builder()
                 .status("200")
@@ -70,6 +78,8 @@ public class PostService {
                 .hits(findPost.getHits())
                 .postDate(findPost.getLastModifiedDate())
                 .writer(findPost.getMember().getNickname())
+                .enableUpdate(enableUpdate)
+                .enableDelete(enableDelete)
                 .build();
     }
 

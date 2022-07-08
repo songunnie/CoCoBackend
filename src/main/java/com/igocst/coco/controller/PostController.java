@@ -28,8 +28,9 @@ public class PostController {
 
     // 게시글 상세 조회
     @GetMapping("/post/{postId}")
-    public PostReadResponseDto readPost(@PathVariable Long postId) {
-        return postService.readPost(postId);
+    public PostReadResponseDto readPost(@PathVariable Long postId,
+                                        @AuthenticationPrincipal MemberDetails memberDetails) {
+        return postService.readPost(postId, memberDetails);
     }
 
     // 게시글 전체 목록 조회
