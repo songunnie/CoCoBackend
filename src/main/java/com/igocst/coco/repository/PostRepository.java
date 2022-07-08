@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // 모집 중인 게시글만 가져온다.
-    List<Post> findAllByRecruitmentStateFalse();
+    List<Post> findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
+    List<Post> findAllByOrderByLastModifiedDateDesc();
 
     @Transactional
     @Modifying
