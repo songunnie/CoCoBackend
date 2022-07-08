@@ -1,6 +1,7 @@
 package com.igocst.coco.service;
 
 import com.igocst.coco.domain.Member;
+import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
 import com.igocst.coco.dto.post.*;
 import com.igocst.coco.repository.MemberRepository;
@@ -66,6 +67,14 @@ public class PostService {
             enableDelete = true;
         }
 
+        // 3. 현재 로그인한 회원이 관리자면, 모든 게시글 삭제 가능
+        MemberRole memberRole = MemberRole.MEMBER;
+        if (memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+            memberRole = MemberRole.ADMIN;
+            enableDelete = true;
+        }
+
+
         return PostReadResponseDto.builder()
                 .status("200")
                 .id(findPost.getId())
@@ -80,6 +89,7 @@ public class PostService {
                 .writer(findPost.getMember().getNickname())
                 .enableUpdate(enableUpdate)
                 .enableDelete(enableDelete)
+                .memberRole(memberRole)
                 .build();
     }
 
@@ -111,7 +121,7 @@ public class PostService {
 
     // 게시글 목록 조회 (모집 중인거만)
     public List<PostReadResponseDto> readRecruitingPostList() {
-        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateTrue();
+        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalse();
 
         List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
         for (Post post : recrutingPosts) {
