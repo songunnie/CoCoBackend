@@ -1,7 +1,7 @@
 package com.igocst.coco.dto.post;
 
 import com.igocst.coco.domain.MeetingType;
-import com.igocst.coco.domain.Post;
+import com.igocst.coco.domain.MemberRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,4 +23,9 @@ public class PostReadResponseDto {
     private int hits;
     private LocalDateTime postDate;
     private String writer;  // 글 작성자 닉네임
+    // 게시글을 수정,삭제 할 수 있는지 여부 체크
+    private boolean enableUpdate;
+    private boolean enableDelete;
+    // 관리자 여부 체크 (관리자는 모든 게시글 삭제 가능)
+    private MemberRole memberRole;
 }
