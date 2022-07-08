@@ -26,7 +26,7 @@ public class MemberController {
     }
 
     // 회원가입
-    @PostMapping("/user")
+    @PostMapping("/register")
     public RegisterResponseDto register(@RequestBody RegisterRequestDto requestDto) throws Exception {
         return memberService.register(requestDto);
     }

@@ -46,7 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 아래의 URI는 무조건 인증 통과
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // cors 때문에 추가
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/user").permitAll()
+                .antMatchers("/register").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/post/list").permitAll()
                 .antMatchers("/post/recruit/list").permitAll()
