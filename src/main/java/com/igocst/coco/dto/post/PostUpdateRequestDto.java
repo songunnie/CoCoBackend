@@ -12,4 +12,5 @@ public class PostUpdateRequestDto {
     private MeetingType meetingType;
     private String contact;
     private String period;
+    private int hits;
 }

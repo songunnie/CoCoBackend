@@ -58,6 +58,8 @@ public class PostService {
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
 
+        postRepository.updateHits(postId);
+
         return PostReadResponseDto.builder()
                 .status("200")
                 .id(findPost.getId())

@@ -42,7 +42,7 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private boolean recruitmentState;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 0", nullable = false)
     private int hits;
 
     @Column(nullable = false)
