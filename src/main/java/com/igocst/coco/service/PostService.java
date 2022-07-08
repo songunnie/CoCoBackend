@@ -75,6 +75,8 @@ public class PostService {
         }
 
 
+        postRepository.updateHits(postId);
+
         return PostReadResponseDto.builder()
                 .status("200")
                 .id(findPost.getId())

@@ -2,7 +2,6 @@ package com.igocst.coco.dto.post;
 
 import com.igocst.coco.domain.MeetingType;
 import com.igocst.coco.domain.MemberRole;
-import com.igocst.coco.domain.Post;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
