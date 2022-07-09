@@ -62,7 +62,9 @@ public class CommentService {
 
         for(Comment c : comments) {
             output.add(CommentReadResponseDto.builder()
+                    .id(c.getId())
                     .comments(c.getContent())
+                    .nickname(c.getMember().getNickname())
                     //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
                     .status("댓글 불러오기 완료")
                     .build());
@@ -131,3 +133,4 @@ public class CommentService {
                 .build();
     }
 }
+
