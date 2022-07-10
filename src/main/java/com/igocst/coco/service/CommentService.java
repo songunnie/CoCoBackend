@@ -66,6 +66,7 @@ public class CommentService {
                     .comments(c.getContent())
                     .nickname(c.getMember().getNickname())
                     //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
+                    .createDate(c.getCreateDate())
                     .status("댓글 불러오기 완료")
                     .build());
         }
@@ -78,14 +79,6 @@ public class CommentService {
                                                   Long comment_id, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
-
-//        Comment comment = commentRepository.findById(comment_id)
-//                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
-
-        //게시글을 찾고, 영속성을 지켜서 구현한 방법.
-//        Post post = member.findPost(post_id);
-//
-//        Comment comment2 = post.findComment(comment_id);
 
         Comment comment = member.findComment(comment_id);
         if (comment == null) {
@@ -106,9 +99,6 @@ public class CommentService {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
 
-
-//        Comment comment = commentRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다"));
 
         boolean isValid = member.deleteComment(id);
 
@@ -133,4 +123,3 @@ public class CommentService {
                 .build();
     }
 }
-
