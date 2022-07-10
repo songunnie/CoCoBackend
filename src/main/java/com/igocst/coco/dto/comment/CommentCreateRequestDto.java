@@ -1,7 +1,5 @@
 package com.igocst.coco.dto.comment;
 
-import com.igocst.coco.domain.Member;
-import com.igocst.coco.domain.Post;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
