@@ -15,4 +15,6 @@ public class CommentReadResponseDto {
     private String nickname;
     private String status;
     private LocalDateTime createDate;
+    // 댓글을 삭제 할 수 있는지 여부 체크
+    private boolean enableDelete;
 }
