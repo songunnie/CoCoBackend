@@ -54,10 +54,15 @@ public class MemberService {
 
 
     // 회원가입
-    public RegisterResponseDto register(RegisterRequestDto requestDto) throws Exception {
+    public RegisterResponseDto register(RegisterRequestDto requestDto) {
         // 회원 DB에 중복된 이메일이 있으면 에러
         if (memberRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("중복된 회원이 존재합니다.");
+            throw new IllegalArgumentException("중복된 이메일을 가진 회원이 존재합니다.");
+        }
+
+        // 회원 DB에 중복된 닉네임이 있으면 에러
+        if (memberRepository.findByNickname(requestDto.getNickname()).isPresent()) {
+            throw new IllegalArgumentException("중복된 닉네임을 가진 회원이 존재합니다.");
         }
 
         // 1. 권한 확인
@@ -156,6 +161,28 @@ public class MemberService {
 
         return MemberDeleteResponseDto.builder()
                 .status("200")
+                .build();
+    }
+
+    // 이메일 중복 체크
+    public CheckDupResponseDto checkEmailDup(CheckEmailDupRequestDto checkEmailDupRequestDto) {
+        // 이메일이 중복이면 true, 아니면 false
+        String email = checkEmailDupRequestDto.getEmail();
+        boolean isDup = memberRepository.findByEmail(email).isPresent();
+
+        return CheckDupResponseDto.builder()
+                .isDup(isDup)
+                .build();
+    }
+
+    // 닉네임 중복 체크
+    public CheckDupResponseDto checkNicknameDup(CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
+        // 닉네임이 중복이면 true, 아니면 false
+        String nickname = checkNicknameDupRequestDto.getNickname();
+        boolean isDup = memberRepository.findByNickname(nickname).isPresent();
+
+        return CheckDupResponseDto.builder()
+                .isDup(isDup)
                 .build();
     }
 }
