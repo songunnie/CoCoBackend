@@ -29,13 +29,14 @@ public class MessageService {
         Member sendMember = memberRepository.findByEmail(memberDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("보내는 사람이 존재하지 않습니다."));
 
+
         String receiver = messageCreateRequestDto.getReceiver();
-        Member receivedMember = memberRepository.findByEmail(receiver)
+        Member received = memberRepository.findByNickname(receiver)
                 .orElseThrow(() -> new IllegalArgumentException("받는 사람이 존재하지 않습니다."));
 
         // message 보내는 코드
         Message message = Message.builder()
-                .receiver(receivedMember)
+                .receiver(received)
                 .title(messageCreateRequestDto.getTitle())
                 .content(messageCreateRequestDto.getContent())
                 .createDate(messageCreateRequestDto.getCreateDate())
@@ -90,7 +91,7 @@ public class MessageService {
             messageList.add(MessageListReadResponseDto.builder()
                     .id(m.getId())
                     .title(m.getTitle())
-                    .sender(m.getSender().getEmail())
+                    .sender(m.getSender().getNickname())
                     .readState(m.isReadState())
                     .createDate(m.getCreateDate())
                     .status("쪽지 리스트를 불러오는데 성공했습니다.")
