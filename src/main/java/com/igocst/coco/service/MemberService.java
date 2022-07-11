@@ -37,7 +37,7 @@ public class MemberService {
         );
 
         // BCrypt으로 암호화된 비밀번호를 비교
-        if (passwordEncoder.matches(findMember.getPassword(), requestDto.getPassword())) {
+        if (!passwordEncoder.matches(requestDto.getPassword(), findMember.getPassword())) {
             throw new IllegalArgumentException("유효하지 않은 비밀번호");
         }
 
