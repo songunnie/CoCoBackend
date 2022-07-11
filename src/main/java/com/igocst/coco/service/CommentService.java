@@ -55,12 +55,17 @@ public class CommentService {
     }
 
     // 댓글 조회
-    public List<CommentReadResponseDto> readCommentList(Long post_id) {
+    public List<CommentReadResponseDto> readCommentList(Long post_id, MemberDetails memberDetails) {
         //List로 받고
         List<Comment> comments = commentRepository.findAllByPostId(post_id);
         List<CommentReadResponseDto> output = new ArrayList<>();
+        boolean enableDelete = false;
 
         for(Comment c : comments) {
+            if (c.getMember().getId() == memberDetails.getMember().getId()) {
+                enableDelete = true;
+            }
+
             output.add(CommentReadResponseDto.builder()
                     .id(c.getId())
                     .comments(c.getContent())
@@ -68,6 +73,7 @@ public class CommentService {
                     //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
                     .createDate(c.getCreateDate())
                     .status("댓글 불러오기 완료")
+                    .enableDelete(enableDelete)
                     .build());
         }
         return output;

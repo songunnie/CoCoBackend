@@ -24,8 +24,9 @@ public class CommentController {
     }
 
     @GetMapping("/comment/list/{post_id}")
-    public List<CommentReadResponseDto> readComment(@PathVariable Long post_id) {
-        return commentService.readCommentList(post_id);
+    public List<CommentReadResponseDto> readComment(@PathVariable Long post_id,
+                                                    @AuthenticationPrincipal MemberDetails memberDetails) {
+        return commentService.readCommentList(post_id, memberDetails);
     }
 
     @PutMapping("/comment/{comment_id}")
