@@ -27,7 +27,7 @@ public class MemberController {
 
     // 회원가입
     @PostMapping("/register")
-    public RegisterResponseDto register(@RequestBody RegisterRequestDto requestDto) throws Exception {
+    public RegisterResponseDto register(@RequestBody RegisterRequestDto requestDto) {
         return memberService.register(requestDto);
     }
 
@@ -74,5 +74,17 @@ public class MemberController {
     @DeleteMapping("/admin/user/{userId}")
     public MemberDeleteResponseDto adminDeleteUser(@PathVariable Long userId) {
         return memberService.adminDeleteMember(userId);
+    }
+
+    // 이메일 중복 체크
+    @PostMapping("/register/check-email")
+    public CheckDupResponseDto checkEmailDup(@RequestBody CheckEmailDupRequestDto checkEmailDupRequestDto) {
+        return memberService.checkEmailDup(checkEmailDupRequestDto);
+    }
+
+    // 닉네임 중복 체크
+    @PostMapping("/register/check-nickname")
+    public CheckDupResponseDto checkNicknameDup(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
+        return memberService.checkNicknameDup(checkNicknameDupRequestDto);
     }
 }
