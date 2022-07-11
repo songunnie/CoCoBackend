@@ -133,7 +133,7 @@ public class MemberService {
 
     // 회원 탈퇴
     @Transactional
-    public MemberDeleteResponseDto deleteMember(Long userId, MemberDetails memberDetails) {
+    public MemberDeleteResponseDto deleteMember(MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 아닙니다."));
 
@@ -141,14 +141,14 @@ public class MemberService {
             throw new NullPointerException("회원이 아닙니다.");
         }
 
-        if (member.getId() != userId) {  // 예외처리를 이정도로 해줘야 하는지, 안해도 되는건지 모르겠음.
-            throw new IllegalArgumentException("권한이 없습니다.");
-        }
+//        if (member.getId() != userId) {  // 예외처리를 이정도로 해줘야 하는지, 안해도 되는건지 모르겠음.
+//            throw new IllegalArgumentException("권한이 없습니다.");
+//        }
 
-        memberRepository.deleteById(userId);
+        memberRepository.deleteById(member.getId());
 
         return MemberDeleteResponseDto.builder()
-                .userId(userId)
+                .userId(member.getId())
                 .status("회원 탈퇴했습니다.")
                 .build();
     }
