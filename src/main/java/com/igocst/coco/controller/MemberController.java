@@ -53,10 +53,9 @@ public class MemberController {
     }
 
     // 회원 탈퇴
-    @DeleteMapping("/user/{userId}")
-    public MemberDeleteResponseDto deleteMember(@PathVariable Long userId,
-                                                 @AuthenticationPrincipal MemberDetails memberDetails) {
-        return memberService.deleteMember(userId, memberDetails);
+    @DeleteMapping("/user")
+    public MemberDeleteResponseDto deleteMember(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.deleteMember(memberDetails);
     }
 
 
