@@ -22,12 +22,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
+//        try {
             // JWT 토큰을 얻어온다
             String token = jwtTokenProvider.resolveToken(request);
 
             // JWT 토큰 검사
-            if (JwtTokenProvider.validateToken(token)) {
+            if (token != null && JwtTokenProvider.validateToken(token)) {
 //                String email = JwtTokenProvider.getMemberEmailFromToken(token);
 
                 // 시큐리티 인증
@@ -39,12 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 완료
-            } else {
-                request.setAttribute("unAuthorization", "인증실패");
             }
-        } catch (Exception e) {
-            System.out.println("인증 예외 발생");
-        }
+//            } else {
+//                request.setAttribute("unAuthorization", "인증실패");
+//            }
+
+//        } catch (Exception e) {
+//            System.out.println("인증 예외 발생");
+//        }
 
         filterChain.doFilter(request, response);
     }
