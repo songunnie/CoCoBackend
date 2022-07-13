@@ -1,3 +1,4 @@
+
 package com.igocst.coco.service;
 
 import com.igocst.coco.domain.Member;
@@ -89,6 +90,9 @@ public class PostService {
                 .hits(findPost.getHits())
                 .postDate(findPost.getLastModifiedDate())
                 .writer(findPost.getMember().getNickname())
+                .githubUrl(findPost.getMember().getGithubUrl())
+                .portfolioUrl(findPost.getMember().getPortfolioUrl())
+                .introduction(findPost.getMember().getIntroduction())
                 .enableUpdate(enableUpdate)
                 .enableDelete(enableDelete)
                 .memberRole(memberRole)
@@ -145,7 +149,7 @@ public class PostService {
         return recrutingPostList;
     }
 
-//  게시글 수정
+    //  게시글 수정
     @Transactional
     public PostUpdateResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, MemberDetails memberDetails) {
         // 로그인된 사용자 정보가 필요
@@ -171,7 +175,7 @@ public class PostService {
                 .build();
     }
 
-//     게시글 삭제
+    //     게시글 삭제
     @Transactional
     public PostDeleteResponseDto deletePost(Long postId, MemberDetails memberDetails) {
         // 로그인된 사용자 정보가 필요
@@ -202,7 +206,7 @@ public class PostService {
         /**
          * 관리자가 임의로 게시글을 삭제한다.
          * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
-        */
+         */
         Post findPost = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         );

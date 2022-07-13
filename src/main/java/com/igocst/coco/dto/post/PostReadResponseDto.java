@@ -28,4 +28,8 @@ public class PostReadResponseDto {
     private boolean enableDelete;
     // 관리자 여부 체크 (관리자는 모든 게시글 삭제 가능)
     private MemberRole memberRole;
+    // 게시글 작성자 정보 불러오기
+    private String githubUrl;
+    private String portfolioUrl;
+    private String introduction;
 }
