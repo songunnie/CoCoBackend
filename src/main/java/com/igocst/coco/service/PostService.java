@@ -99,7 +99,7 @@ public class PostService {
     public List<PostReadResponseDto> readPostList() {
         // 1. 게시글을 다 가져온다
         List<Post> posts = postRepository.findAllByOrderByLastModifiedDateDesc();
-
+        System.out.println(posts.size());
         // 2. 가져온 게시글을 DTO 목록에 담아 반환한다.
         List<PostReadResponseDto> postList = new ArrayList<>();
         for (Post post : posts) {
@@ -124,7 +124,7 @@ public class PostService {
     // 게시글 목록 조회 (모집 중인거만)
     public List<PostReadResponseDto> readRecruitingPostList() {
         List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
-
+        System.out.println(recrutingPosts.size());
         List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
         for (Post post : recrutingPosts) {
             recrutingPostList.add(PostReadResponseDto.builder()

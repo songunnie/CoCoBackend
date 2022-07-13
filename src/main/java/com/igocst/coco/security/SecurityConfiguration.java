@@ -52,7 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/post/recruit/list").permitAll()
                 // 이외의 URI는 인증을 거친다.
                 .anyRequest()
-                .authenticated()
+                .permitAll()
+//                .authenticated()
                 .and()
                 .formLogin().disable()
                 // JWT 필터를 추가, 요청이 올때마다 JWT 토큰을 검사한다.

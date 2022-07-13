@@ -4,6 +4,7 @@ import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.MemberDetailsService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,43 +55,44 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.getAuthorities());
     }
 
-//    private final static String HEADER_AUTHORIZATION = "Authorization";
-//    private final static String TOKEN_PREFIX = "Bearer ";
+    private final static String HEADER_AUTHORIZATION = "Authorization";
+    private final static String TOKEN_PREFIX = "Bearer ";
 
-    // http 요청 헤더에서 JWT 토큰 값 가져오기
+//     http 요청 헤더에서 JWT 토큰 값 가져오기
 //    public String resolveToken(HttpServletRequest request) {
 //        return request.getHeader("X-AUTH-TOKEN");
 //    }
 
-    // JWT 토큰이 Authorization Bearer 헤더에 있다
-//    public String resolveToken(HttpServletRequest request) {
-//        String headerValue = request.getHeader(HEADER_AUTHORIZATION);
-//        if (headerValue == null) {
+//     JWT 토큰이 Authorization Bearer 헤더에 있다
+    public String resolveToken(HttpServletRequest request) {
+        String headerValue = request.getHeader(HEADER_AUTHORIZATION);
+        if (headerValue == null) {
+            return null;
 //            throw new RuntimeException("토큰 정보가 없습니다.");
-//        }
-//
-//        if (!headerValue.startsWith(TOKEN_PREFIX)) {
-//            throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
-//        }
-//
-//        // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
-//        return headerValue.substring(TOKEN_PREFIX.length());
-//    }
+        }
+
+        if (!headerValue.startsWith(TOKEN_PREFIX)) {
+            throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
+        }
+
+        // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
+        return headerValue.substring(TOKEN_PREFIX.length());
+    }
 
     // JWT 토큰이 쿠키에 담겨져 있다
-    public String resolveToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies.length < 1) {
-            throw new RuntimeException("JWT 토큰이 존재하지 않습니다.");
-        }
-        String token = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")) {
-                token = cookie.getValue();
-            }
-        }
-        return token;
-    }
+//    public String resolveToken(HttpServletRequest request) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies.length < 1) {
+//            throw new RuntimeException("JWT 토큰이 존재하지 않습니다.");
+//        }
+//        String token = null;
+//        for (Cookie cookie : cookies) {
+//            if (cookie.getName().equals("token")) {
+//                token = cookie.getValue();
+//            }
+//        }
+//        return token;
+//    }
 
     // JWT 토큰 예외 검사
     public static boolean validateToken(String token) {

@@ -14,6 +14,7 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
+
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
@@ -45,7 +48,7 @@ public class MemberService {
 //        Authentication authentication = new UsernamePasswordAuthenticationToken(requestDto.getEmail(), null, null);
 //        String token = JwtTokenProvider.generateToken(authentication);
         String token = JwtTokenProvider.generateToken(requestDto.getEmail());
-
+        log.info(token);
         return LoginResponseDto.builder()
                 .status("200")
                 .token(token)
