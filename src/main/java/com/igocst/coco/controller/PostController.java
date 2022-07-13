@@ -1,7 +1,6 @@
 package com.igocst.coco.controller;
 
 
-import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.post.*;
 import com.igocst.coco.security.MemberDetails;
