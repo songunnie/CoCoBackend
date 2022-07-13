@@ -2,6 +2,7 @@ package com.igocst.coco.service;
 
 import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
+import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
 import com.igocst.coco.dto.comment.*;
 import com.igocst.coco.repository.CommentRepository;
@@ -59,10 +60,20 @@ public class CommentService {
         //List로 받고
         List<Comment> comments = commentRepository.findAllByPostId(post_id);
         List<CommentReadResponseDto> output = new ArrayList<>();
-        boolean enableDelete = false;
+        boolean enableDelete;
 
         for(Comment c : comments) {
+            enableDelete = false;
+
+            // 로그인한 회원은 본인이 작성한 댓글만 삭제할 수 있다.
             if (c.getMember().getId() == memberDetails.getMember().getId()) {
+                enableDelete = true;
+            }
+
+            // 현재 로그인한 회원이 관리자라면 모든 댓글을 삭제할 수 있다.
+            MemberRole memberRole = MemberRole.MEMBER;
+            if (memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+                memberRole = MemberRole.ADMIN;
                 enableDelete = true;
             }
 
@@ -74,6 +85,7 @@ public class CommentService {
                     .createDate(c.getCreateDate())
                     .status("댓글 불러오기 완료")
                     .enableDelete(enableDelete)
+                    .memberRole(memberRole)
                     .build());
         }
         return output;
