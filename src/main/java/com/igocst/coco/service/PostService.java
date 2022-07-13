@@ -175,9 +175,9 @@ public class PostService {
 //            throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
             return new ResponseEntity<>(
                     PostUpdateResponseDto.builder()
-                            .status(StatusMessage.INVALID_PARAM)
+                            .status(StatusMessage.BAD_REQUEST)
                             .build(),
-                    HttpStatus.valueOf(StatusCode.INVALID_PARAM)
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
 
@@ -209,9 +209,9 @@ public class PostService {
 //            throw new RuntimeException("삭제할 수 없습니다.");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
+                            .status(StatusMessage.BAD_REQUEST)
                             .build(),
-                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
 
