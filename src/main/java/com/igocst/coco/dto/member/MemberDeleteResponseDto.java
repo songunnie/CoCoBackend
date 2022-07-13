@@ -6,6 +6,5 @@ import lombok.Getter;
 @Getter
 @Builder
 public class MemberDeleteResponseDto {
-    private Long userId;
     private String status;
 }
