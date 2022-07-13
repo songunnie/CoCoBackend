@@ -1,5 +1,6 @@
 package com.igocst.coco.dto.comment;
 
+import com.igocst.coco.domain.MemberRole;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,4 +18,6 @@ public class CommentReadResponseDto {
     private LocalDateTime createDate;
     // 댓글을 삭제 할 수 있는지 여부 체크
     private boolean enableDelete;
+    // 관리자 여부 체크
+    private MemberRole memberRole;
 }
