@@ -1,5 +1,7 @@
 package com.igocst.coco.service;
 
+import com.igocst.coco.common.status.StatusCode;
+import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
@@ -10,6 +12,8 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,7 +31,7 @@ public class CommentService {
     //DB동기화를 위해
     @Transactional
     //comment를 받으면 CommentRepository에 저장
-    public CommentCreateResponseDto join(CommentCreateRequestDto commentCreateRequestDto, Long post_id, MemberDetails memberDetails) { //join = comment create
+    public ResponseEntity<CommentCreateResponseDto> join(CommentCreateRequestDto commentCreateRequestDto, Long post_id, MemberDetails memberDetails) { //join = comment create
         //회원을 찾아 가져오고.
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다"));
@@ -49,14 +53,17 @@ public class CommentService {
         //댓글을 repo에 저장해줌. 이거 필요없.
         commentRepository.save(comment);
 
-        return CommentCreateResponseDto.builder()
-                .status("댓글이 작성되었습니다")
-                //status "메시지가 저장되었습니다" 내려주기
-                .build();
+        return new ResponseEntity<>(
+                CommentCreateResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
     // 댓글 조회
-    public List<CommentReadResponseDto> readCommentList(Long post_id, MemberDetails memberDetails) {
+    public ResponseEntity<List<CommentReadResponseDto>> readCommentList(Long post_id, MemberDetails memberDetails) {
         //List로 받고
         List<Comment> comments = commentRepository.findAllByPostId(post_id);
         List<CommentReadResponseDto> output = new ArrayList<>();
@@ -83,37 +90,47 @@ public class CommentService {
                     .nickname(c.getMember().getNickname())
                     //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
                     .createDate(c.getCreateDate())
-                    .status("댓글 불러오기 완료")
+                    .status(StatusMessage.SUCCESS)
                     .enableDelete(enableDelete)
                     .memberRole(memberRole)
                     .build());
         }
-        return output;
+        return new ResponseEntity<>(output, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
     //댓글 수정
     @Transactional
-    public CommentUpdateResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto,
+    public ResponseEntity<CommentUpdateResponseDto> updateComment(CommentUpdateRequestDto commentUpdateRequestDto,
                                                   Long comment_id, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
 
         Comment comment = member.findComment(comment_id);
         if (comment == null) {
-            throw new RuntimeException("작성한 댓글을 찾을 수 없습니다.");
+//            throw new RuntimeException("작성한 댓글을 찾을 수 없습니다.");
+            return new ResponseEntity<>(
+                    CommentUpdateResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         //setter를 쓰니까 .setContent로 바로해주면 됨.
         comment.setContent(commentUpdateRequestDto.getContent());
 
-        return CommentUpdateResponseDto.builder()
-                .status("댓글이 수정되었습니다")
-                .build();
+        return new ResponseEntity<>(
+                CommentUpdateResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
     //댓글 삭제
     @Transactional
-    public CommentDeleteResponseDto deleteComment(Long id, MemberDetails memberDetails) {
+    public ResponseEntity<CommentDeleteResponseDto> deleteComment(Long id, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
 
@@ -121,23 +138,44 @@ public class CommentService {
         boolean isValid = member.deleteComment(id);
 
         if(!isValid) {
-            throw new RuntimeException("삭제할 수 없습니다.");
+//            throw new RuntimeException("삭제할 수 없습니다.");
+            return new ResponseEntity<>(
+                    CommentDeleteResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         commentRepository.deleteById(id);
 
-        return CommentDeleteResponseDto.builder()
-                .id(id)
-                .status("댓글이 삭제되었습니다.")
-                .build();
+        return new ResponseEntity<>(
+                CommentDeleteResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
     // 관리자, 댓글 삭제
-    public CommentDeleteResponseDto adminDeleteComment(Long commentId) {
+    public ResponseEntity<CommentDeleteResponseDto> adminDeleteComment(Long commentId, MemberDetails memberDetails) {
+        if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+            return new ResponseEntity<>(
+                    CommentDeleteResponseDto.builder()
+                            .status(StatusMessage.UNAUTHORIZED_USER)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.UNAUTHORIZED_USER)
+            );
+        }
         commentRepository.deleteById(commentId);
 
-        return CommentDeleteResponseDto.builder()
-                .id(commentId)
-                .build();
+        return new ResponseEntity<>(
+                CommentDeleteResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 }

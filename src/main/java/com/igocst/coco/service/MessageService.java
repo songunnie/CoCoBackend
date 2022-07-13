@@ -1,5 +1,7 @@
 package com.igocst.coco.service;
 
+import com.igocst.coco.common.status.StatusCode;
+import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.Message;
 import com.igocst.coco.dto.message.*;
@@ -8,6 +10,8 @@ import com.igocst.coco.repository.MessageRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +26,8 @@ public class MessageService {
     private final MemberRepository memberRepository;
 
     // 쪽지 보내기
-    @Builder
     @Transactional
-    public MessageCreateResponseDto join(MessageCreateRequestDto messageCreateRequestDto, MemberDetails memberDetails) {
+    public ResponseEntity<MessageCreateResponseDto> join(MessageCreateRequestDto messageCreateRequestDto, MemberDetails memberDetails) {
 
         Member sendMember = memberRepository.findByEmail(memberDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("보내는 사람이 존재하지 않습니다."));
@@ -45,39 +48,53 @@ public class MessageService {
         sendMember.sendMessage(message);
         messageRepository.save(message);
 
-        return MessageCreateResponseDto.builder()
-                .status("쪽지 전송에 성공했습니다.")
-                .build();
+        return new ResponseEntity<>(
+                MessageCreateResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
 
     // 쪽지 상세 읽기
     @Transactional
-    public MessageReadResponseDto getMessage(Long messageId, MemberDetails memberDetails) {
+    public ResponseEntity<MessageReadResponseDto> getMessage(Long messageId, MemberDetails memberDetails) {
 
         Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
 
         Message message = member.findMessage(messageId);
         if (message == null) {
-            throw new RuntimeException("쪽지에 대한 권한이 없습니다.");
+//            throw new RuntimeException("쪽지에 대한 권한이 없습니다.");
+            return new ResponseEntity<>(
+                    MessageReadResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         message.setReadState(true);
 
-        return MessageReadResponseDto.builder()
-                .sender(message.getSender().getEmail())
-                .title(message.getTitle())
-                .content(message.getContent())
-                .readState(message.isReadState())
-                .status("쪽지를 불러오는데 성공했습니다.")
-                .build();
+        return new ResponseEntity<>(
+                MessageReadResponseDto.builder()
+                        .sender(message.getSender().getEmail())
+                        .title(message.getTitle())
+                        .content(message.getContent())
+                        .readState(message.isReadState())
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
 
     // 쪽지 리스트 읽기
     @Transactional
-    public List<MessageListReadResponseDto> getMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
+    public ResponseEntity<List<MessageListReadResponseDto>> getMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
 
         String readMember = memberDetails.getUsername();
 
@@ -94,16 +111,16 @@ public class MessageService {
                     .sender(m.getSender().getNickname())
                     .readState(m.isReadState())
                     .createDate(m.getCreateDate())
-                    .status("쪽지 리스트를 불러오는데 성공했습니다.")
+                    .status(StatusMessage.SUCCESS)
                     .build());
         }
-        return messageList;
+        return new ResponseEntity<>(messageList, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
 
     // 쪽지 삭제
     @Transactional
-    public MessageDeleteResponseDto deleteMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
+    public ResponseEntity<MessageDeleteResponseDto> deleteMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
 
         Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
@@ -111,14 +128,23 @@ public class MessageService {
         boolean isValid = member.deleteMessage(messageId);
 
         if (!isValid) {
-            throw new RuntimeException("쪽지를 삭제할 수 있는 권한이 없습니다.");
+//            throw new RuntimeException("쪽지를 삭제할 수 있는 권한이 없습니다.");
+            return new ResponseEntity<>(
+                    MessageDeleteResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         messageRepository.deleteById(messageId);
 
-        return MessageDeleteResponseDto.builder()
-                .messageId(messageId)
-                .status("쪽지를 삭제하는데 성공했습니다.")
-                .build();
+        return new ResponseEntity<>(
+                MessageDeleteResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 }
