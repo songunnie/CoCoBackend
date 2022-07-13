@@ -84,6 +84,7 @@ public class MemberService {
                 .nickname(requestDto.getNickname())
                 .githubUrl(requestDto.getGithubUrl())
                 .portfolioUrl(requestDto.getPortfolioUrl())
+                .introduction((requestDto.getIntroduction()))
                 .role(role) // 권한 추가 (ADMIN / MEMBER)
                 .build();
 
@@ -99,7 +100,7 @@ public class MemberService {
     public MemberReadResponseDto readMember(MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getMember().getId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
-        
+
         return MemberReadResponseDto.builder()
                 .email(member.getEmail())
                 .nickname(member.getNickname())

@@ -9,6 +9,7 @@ public class RegisterRequestDto {
     private String nickname;
     private String githubUrl;
     private String portfolioUrl;
+    private String introduction;
     // 관리자
     private boolean admin = false;
     private String adminToken = "";
