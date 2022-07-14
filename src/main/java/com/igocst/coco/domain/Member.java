@@ -197,4 +197,27 @@ public class Member extends Timestamped {
     public void updateIntroduction(String introduction){
         this.introduction = introduction;
     }
+
+    // 북마크
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<Bookmark> bookmarks = new ArrayList<>();
+    public void addBookmark(Bookmark bookmark) {
+        bookmark.setMember(this);
+        bookmarks.add(bookmark);
+    }
+
+    public boolean deleteBookmark(Long postId) {
+        if (postId <= 0) {
+            return false;
+        }
+
+        for (Bookmark bookmark : bookmarks) {
+            if (bookmark.getId() == postId){
+                bookmarks.remove(bookmark);
+                return true;
+            }
+        }
+        return false;
+    }
 }
