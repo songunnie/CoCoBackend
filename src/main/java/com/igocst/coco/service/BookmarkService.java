@@ -42,9 +42,7 @@ public class BookmarkService {
             }
         }
 
-        Bookmark bookmark = Bookmark.builder()
-                .id(post.getId())
-                .build();
+        Bookmark bookmark = new Bookmark();
 
         member.addBookmark(bookmark);
         post.addBookmark(bookmark);
