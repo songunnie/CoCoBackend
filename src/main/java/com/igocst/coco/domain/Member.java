@@ -197,4 +197,8 @@ public class Member extends Timestamped {
     public void updateIntroduction(String introduction){
         this.introduction = introduction;
     }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

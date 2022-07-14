@@ -14,4 +14,6 @@ public class MemberReadResponseDto {
     private String portfolioUrl;
     private String introduction;
     private String status;
+    // 프로필 페이지 이미지
+    private String profileImageUrl;
 }
