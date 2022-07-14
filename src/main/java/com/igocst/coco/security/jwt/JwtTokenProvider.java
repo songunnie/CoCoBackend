@@ -21,7 +21,7 @@ public class JwtTokenProvider {
 
     private static final String SECRET_KEY = "COCOPROJECTLETSGO";
     // 만료 시간 어떻게?, 1시간? 6시간? 하루?
-    private static final int EXPIRATION_MS = 3600000;
+    private static final int EXPIRATION_MS = 3600000 * 3;   // 3시간
     private final MemberDetailsService memberDetailsService;
 
 
