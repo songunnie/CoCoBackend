@@ -1,0 +1,36 @@
+package com.igocst.coco.controller;
+
+import com.igocst.coco.dto.bookmark.BookmarkDeleteResponseDto;
+import com.igocst.coco.dto.bookmark.BookmarkListReadResponseDto;
+import com.igocst.coco.dto.bookmark.BookmarkSaveResponseDto;
+import com.igocst.coco.security.MemberDetails;
+import com.igocst.coco.service.BookmarkService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+public class BookmarkController {
+    private final BookmarkService bookmarkService;
+
+    @PostMapping("/bookmark/{postId}")
+    public BookmarkSaveResponseDto saveBookmark(@PathVariable Long postId,
+                                                @AuthenticationPrincipal MemberDetails memberDetails) {
+        return bookmarkService.join(postId, memberDetails);
+    }
+
+    @GetMapping("/bookmark/list")
+    public List<BookmarkListReadResponseDto> readBookmarkList(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return bookmarkService.readBookmarkList(memberDetails);
+    }
+
+    @DeleteMapping("/bookmark/{bookmarkId}")
+    public BookmarkDeleteResponseDto deleteBookmark(@PathVariable Long bookmarkId,
+                                                    @AuthenticationPrincipal MemberDetails memberDetails) {
+        return bookmarkService.deleteBookmark(bookmarkId, memberDetails);
+    }
+
+}

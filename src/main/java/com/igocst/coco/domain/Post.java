@@ -53,6 +53,10 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
+    // 북마크
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
     /**
      * 연관관계 편의 메소드
      */
@@ -83,5 +87,11 @@ public class Post extends Timestamped {
     public void addComment(Comment comment) {
         comment.setPost(this);
         comments.add(comment);
+    }
+
+    // 북마크
+    public void addBookmark(Bookmark bookmark) {
+        bookmark.setPost(this);
+        bookmarks.add(bookmark);
     }
 }
