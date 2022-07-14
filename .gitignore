@@ -8,3 +8,6 @@
 # Gradle Caches
 **/.gradle/
 **/build/
+
+#applicaton.properties
+src/main/resources/application.properties

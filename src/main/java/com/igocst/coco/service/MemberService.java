@@ -129,7 +129,12 @@ public class MemberService {
         }
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
-        String fileUrl = s3Service.upload(file, "profileImage");
+        // 분기 처리
+        if (file != null) {
+            String fileUrl = s3Service.upload(file, "profileImage");
+            member.updateProfileImage(fileUrl);
+        }
+
         // TODO: Step 1. 똑같은 정보를 준건지, 하나라도 수정이 된건지 체크! -> 조건문으로 분기처리를해서 돌아가는지 테스트해봐야할듯.(DB에 최소한으로 다녀오기!)
         // TODO: Step 2. S3에 저장하기(S3에 저장해야 해당 파일에 대한 url에 반환되기 때문에!)
         // TODO: Step 3. DB에 저장하기(반환된 S3에 저장되어있는 url을 DB에 저장)
@@ -146,7 +151,6 @@ public class MemberService {
         member.updateIntroduction(memberUpdateRequestDto.getIntroduction());
         //updateRequestDto단에서 ProfileImageUrl 받을 이유가 없응ㅁ.
 //        member.updateProfileImage(memberUpdateRequestDto.getProfileImageUrl());
-        member.updateProfileImage(fileUrl);
 
         memberRepository.save(member);
 

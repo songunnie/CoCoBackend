@@ -31,9 +31,8 @@ public class S3Service {
     public String bucket;
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        File uploadFile = convert(multipartFile)
-                // 파일 변환할 수 없으면 에러
-                .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
+        File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
+                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환을 실패했습니다"));
 
         return upload(uploadFile, dirName);
 
@@ -41,7 +40,8 @@ public class S3Service {
 
     // S3로 파일 업로드하기
     private String upload(File uploadFile, String dirName) {
-        //filename을 받고 -> uploadImageUrl을 반환 받음(39번쨰줄)
+        //filename을 받고 -> uploadImageUrl을 반환 받음
+        // 난수화를 위해 UUID 사용
         String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
         removeNewFile(uploadFile);
@@ -50,20 +50,32 @@ public class S3Service {
 
     // S3로 업로드
     private String putS3(File uploadFile, String fileName) {
-        amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3Client.putObject(
+                new PutObjectRequest(bucket, fileName, uploadFile)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
+    private void delete(String fileKey) {
+        amazonS3Client.deleteObject(bucket, fileKey);
+    }
+//   public String reupload(MultipartFile file, String currentFilePath, String imageKey) {
+//        String fileName =
+//    }
+
     // 로컬에 저장된 이미지 지우기
+    // 임시로 생성된 new file을 삭제해준다!
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
-            log.info("File delete success");
+            log.info("파일이 삭제되었습니다");
             return;
+        } else {
+            log.info("파일 삭제에 실패했습니다");
         }
-        log.info("File delete fail");
     }
 
     // 로컬에 파일 업로드 하기
+    //multipartFile을 File타입으로 변환해줌 (변환된 파일을 가지고 put을 해주면 됨) -> ?왓..난 이미 put했는데..!
     private Optional<File> convert(MultipartFile file) throws IOException {
         File convertFile = new File(System.getProperty("user.dir") + "/" + file.getOriginalFilename());
         if (convertFile.createNewFile()) { // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
@@ -75,45 +87,4 @@ public class S3Service {
 
         return Optional.empty();
     }
-    // 다른버전으로 시도
-//public String upload(MultipartFile file, String profileImage) {
-//    String key = UUID.randomUUID() + "_" + file.getOriginalFilename();
-//    try {
-//
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentType(file.getContentType());
-//        PutObjectRequest request = new PutObjectRequest(bucket, key, file.getInputStream(), metadata);
-//        request.withCannedAcl(CannedAccessControlList.PublicRead); // 접근권한 체크
-//        PutObjectResult result = amazonS3Client.putObject(request);
-//        return key;
-//    } catch (AmazonServiceException e) {
-//        // The call was transmitted successfully, but Amazon S3 couldn't process
-//        // it, so it returned an error response.
-//        log.error("upload AmazonServiceException filePath={}, yyyymm={}, error={}", e.getMessage());
-//    } catch (SdkClientException e) {
-//        // Amazon S3 couldn't be contacted for a response, or the client
-//        // couldn't parse the response from Amazon S3.
-//        log.error("upload SdkClientException filePath={}, error={}", e.getMessage());
-//    } catch (Exception e) {
-//        // Amazon S3 couldn't be contacted for a response, or the client
-//        // couldn't parse the response from Amazon S3.
-//        log.error("upload SdkClientException filePath={}, error={}", e.getMessage());
-//    }
-//
-//    return key;
-//}
-//
-//    public void delete(String fileKey) {
-//        amazonS3Client.deleteObject(bucket, fileKey);
-//    }
-//
-//    public void rename(String sourceKey, String destinationKey){
-//        amazonS3Client.copyObject(
-//                bucket,
-//                sourceKey,
-//                bucket,
-//                destinationKey
-//        );
-//        amazonS3Client.deleteObject(bucket, sourceKey);
-//    }
 }
