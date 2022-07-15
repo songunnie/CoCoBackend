@@ -1,15 +1,9 @@
 package com.igocst.coco.service;
 
 
-import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
-import com.igocst.coco.dto.comment.CommentReadResponseDto;
-import com.igocst.coco.dto.comment.CommentUpdateRequestDto;
-import com.igocst.coco.dto.comment.CommentUpdateResponseDto;
 import com.igocst.coco.dto.member.*;
-import com.igocst.coco.dto.message.MessageDeleteResponseDto;
-import com.igocst.coco.dto.message.MessageReadResponseDto;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
@@ -22,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -127,11 +119,12 @@ public class MemberService {
         if (member == null) {
             throw new RuntimeException("프로필 수정 권한이 없습니다.");
         }
+
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
         // 분기 처리
         if (file != null) {
-            String fileUrl = s3Service.upload(file, "profileImage");
+            String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
             member.updateProfileImage(fileUrl);
         }
 
@@ -213,4 +206,18 @@ public class MemberService {
                 .isDup(isDup)
                 .build();
     }
+
+    //프로필 모달에서 닉네임 중복체크
+//    public CheckDupResponseDto checkNicknameDupProfile(CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
+//
+//        //닉네임이 기존 닉네임과 같지 않을 때 동작
+//        String nickname = checkNicknameDupRequestDto.getNickname();
+//        if (nickname != checkNicknameDupRequestDto.getNickname()) {
+//            boolean isDup = memberRepository.findByNickname(nickname).isPresent();
+//        }
+//
+//        return CheckDupResponseDto.builder()
+//                .isDup(isDup)
+//                .build();
+//    }
 }

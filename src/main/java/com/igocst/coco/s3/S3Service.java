@@ -1,12 +1,9 @@
 package com.igocst.coco.s3;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
+import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,22 +28,42 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName, MemberDetails memberDetails) throws IOException {
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환을 실패했습니다"));
 
-        return upload(uploadFile, dirName);
 
+        try {
+            return upload(uploadFile, dirName, memberDetails);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    // S3로 파일 업로드하기
-    private String upload(File uploadFile, String dirName) {
+    private String upload(File uploadFile, String dirName, MemberDetails memberDetails) throws NoSuchAlgorithmException {
         //filename을 받고 -> uploadImageUrl을 반환 받음
         // 난수화를 위해 UUID 사용
-        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름
-        String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
+//        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();
+        String fileName = memberDetails.getNickname();
+        String cryptogram = encrypt(fileName);// S3에 저장된 파일 이름
+        String uploadImageUrl = putS3(uploadFile, dirName+"/"+cryptogram); // s3로 업로드
         removeNewFile(uploadFile);
         return uploadImageUrl;
+    }
+
+    //파일명 암호화를 위한 세팅
+    public String encrypt(String text) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(text.getBytes());
+
+        return bytesToHex(md.digest());
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            builder.append(String.format("%02x", b));
+        }
+        return builder.toString();
     }
 
     // S3로 업로드

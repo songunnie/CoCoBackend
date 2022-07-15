@@ -4,15 +4,12 @@ import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
-import com.igocst.coco.security.jwt.JwtTokenProvider;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 
 
@@ -51,13 +48,8 @@ public class MemberController {
     public MemberReadResponseDto readMember(@AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.readMember(memberDetails);
     }
-    //회원 정보 수정
-//    @PutMapping("/user")
-//    public MemberUpdateResponseDto updateMember(@RequestBody MemberUpdateRequestDto memberUpdateRequestDto,
-//                                                                @AuthenticationPrincipal MemberDetails memberDetails) {
-//        return memberService.updateMember(memberUpdateRequestDto, memberDetails);
-//    }
 
+    //회원 정보 수정
     @PutMapping("/user")
     public MemberUpdateResponseDto updateMember(@ModelAttribute MemberUpdateRequestDto memberUpdateRequestDto,
                                                 @AuthenticationPrincipal MemberDetails memberDetails)
@@ -103,9 +95,9 @@ public class MemberController {
         return memberService.checkNicknameDup(checkNicknameDupRequestDto);
     }
 
-//    @PostMapping("/user/profile")
-//    public String upload(@RequestParam("profileImageUrl") MultipartFile multipartFile) throws IOException {
-//        s3Service.upload(multipartFile, "profileImage");
-//        return "test";
-//    }
+    // 프로필 모달 닉네임 중복 체크
+    @PutMapping("/user/check-nickname")
+    public CheckDupResponseDto checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
+        return memberService.checkNicknameDup(checkNicknameDupRequestDto);
+    }
 }
