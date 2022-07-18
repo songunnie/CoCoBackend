@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -74,9 +75,9 @@ public class S3Service {
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
-    private void delete(String fileKey) {
-        amazonS3Client.deleteObject(bucket, fileKey);
-    }
+//    private void delete(String fileKey) {
+//        amazonS3Client.deleteObject(bucket, fileKey);
+//    }
 //   public String reupload(MultipartFile file, String currentFilePath, String imageKey) {
 //        String fileName =
 //    }

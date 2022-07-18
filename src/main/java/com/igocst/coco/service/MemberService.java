@@ -10,6 +10,7 @@ import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -118,6 +119,10 @@ public class MemberService {
 
         if (member == null) {
             throw new RuntimeException("프로필 수정 권한이 없습니다.");
+        }
+
+        if(memberRepository.findByNickname(memberUpdateRequestDto.getNickname()).isPresent()) {
+            throw new IllegalArgumentException("중복된 닉네임을 가진 회원이 존재합니다.");
         }
 
         //파일을 getfile로 해서 받음
