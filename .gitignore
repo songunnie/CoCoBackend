@@ -9,5 +9,8 @@
 **/.gradle/
 **/build/
 
-#applicaton.properties
-src/main/resources/application.properties
+##applicaton.properties
+#src/main/resources/application.properties
+
+# IntelliJ IDEA
+application-aws.properties

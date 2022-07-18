@@ -44,7 +44,7 @@ public class MemberController {
 
     //회원 정보 수정
     @PutMapping("/user")
-    public ResponseEntity<MemberUpdateResponseDto> updateMember(@RequestBody MemberUpdateRequestDto memberUpdateRequestDto,
+    public ResponseEntity<MemberUpdateResponseDto> updateMember(@ModelAttribute MemberUpdateRequestDto memberUpdateRequestDto,
                                                                 @AuthenticationPrincipal MemberDetails memberDetails) throws IOException {
         return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
@@ -77,7 +77,8 @@ public class MemberController {
 
     // 프로필 모달 닉네임 중복 체크
     @PutMapping("/user/check-nickname")
-    public ResponseEntity<CheckDupResponseDto> checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
-        return memberService.checkNicknameDup(checkNicknameDupRequestDto);
+    public ResponseEntity<CheckDupResponseDto> checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto,
+                                                                       @AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.checkNicknameDupProfile(checkNicknameDupRequestDto, memberDetails);
     }
 }
