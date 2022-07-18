@@ -1,5 +1,8 @@
+
 package com.igocst.coco.service;
 
+import com.igocst.coco.common.status.StatusCode;
+import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
@@ -8,6 +11,8 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +29,7 @@ public class PostService {
 
     // 게시글 생성
     @Transactional
-    public PostSaveResponseDto createPost(PostSaveRequestDto postSaveRequestDto, MemberDetails memberDetails) {
+    public ResponseEntity<PostSaveResponseDto> createPost(PostSaveRequestDto postSaveRequestDto, MemberDetails memberDetails) {
         // 어떤 회원이 게시글을 작성할건지 (로그인 되어있는 회원)
 
         // 1. 회원 id 가져온다
@@ -46,13 +51,16 @@ public class PostService {
 //        post.addMember(member);  // 양방향 값 세팅
         postRepository.save(post);
 
-        return PostSaveResponseDto.builder()
-                .status("게시글 저장에 성공했습니다.")
-                .build();
+        return new ResponseEntity<>(
+                PostSaveResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
     }
 
     // 게시글 내용(상세) 조회
-    public PostReadResponseDto readPost(Long postId, MemberDetails memberDetails) {
+    public ResponseEntity<PostReadResponseDto> readPost(Long postId, MemberDetails memberDetails) {
         // 로그인된 사용자의 정보가 필요 (로그인된 사용자가 아니면 접근 불가, JWT로 인증이 안되면 접근 불가)
 
         // 1. postId에 해당하는 게시글 조회
@@ -77,34 +85,40 @@ public class PostService {
 
         postRepository.updateHits(postId);
 
-        return PostReadResponseDto.builder()
-                .status("200")
-                .id(findPost.getId())
-                .title(findPost.getTitle())
-                .content(findPost.getContent())
-                .meetingType(findPost.getMeetingType())
-                .contact(findPost.getContact())
-                .period(findPost.getPeriod())
-                .recruitmentState(findPost.isRecruitmentState())
-                .hits(findPost.getHits())
-                .postDate(findPost.getLastModifiedDate())
-                .writer(findPost.getMember().getNickname())
-                .enableUpdate(enableUpdate)
-                .enableDelete(enableDelete)
-                .memberRole(memberRole)
-                .build();
+        return new ResponseEntity<>(
+                PostReadResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .id(findPost.getId())
+                        .title(findPost.getTitle())
+                        .content(findPost.getContent())
+                        .meetingType(findPost.getMeetingType())
+                        .contact(findPost.getContact())
+                        .period(findPost.getPeriod())
+                        .recruitmentState(findPost.isRecruitmentState())
+                        .hits(findPost.getHits())
+                        .postDate(findPost.getLastModifiedDate())
+                        .writer(findPost.getMember().getNickname())
+                        .githubUrl(findPost.getMember().getGithubUrl())
+                        .portfolioUrl(findPost.getMember().getPortfolioUrl())
+                        .introduction(findPost.getMember().getIntroduction())
+                        .enableUpdate(enableUpdate)
+                        .enableDelete(enableDelete)
+                        .memberRole(memberRole)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
     }
 
     // 게시글 목록 전체 조회
-    public List<PostReadResponseDto> readPostList() {
+    public ResponseEntity<List<PostReadResponseDto>> readPostList() {
         // 1. 게시글을 다 가져온다
         List<Post> posts = postRepository.findAllByOrderByLastModifiedDateDesc();
-        System.out.println(posts.size());
         // 2. 가져온 게시글을 DTO 목록에 담아 반환한다.
         List<PostReadResponseDto> postList = new ArrayList<>();
+
         for (Post post : posts) {
             postList.add(PostReadResponseDto.builder()
-                    .status("200")
+                    .status(StatusMessage.SUCCESS)
                     .id(post.getId())
                     .title(post.getTitle())
                     .content(post.getContent())
@@ -118,17 +132,18 @@ public class PostService {
                     .build()
             );
         }
-        return postList;
+        return new ResponseEntity<>(postList, HttpStatus.valueOf(StatusCode.SUCCESS));
+
     }
 
     // 게시글 목록 조회 (모집 중인거만)
-    public List<PostReadResponseDto> readRecruitingPostList() {
+    public ResponseEntity<List<PostReadResponseDto>> readRecruitingPostList() {
         List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
-        System.out.println(recrutingPosts.size());
         List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
+
         for (Post post : recrutingPosts) {
             recrutingPostList.add(PostReadResponseDto.builder()
-                    .status("200")
+                    .status(StatusMessage.SUCCESS)
                     .id(post.getId())
                     .title(post.getTitle())
                     .content(post.getContent())
@@ -142,12 +157,12 @@ public class PostService {
                     .build()
             );
         }
-        return recrutingPostList;
+        return new ResponseEntity<>(recrutingPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
-//  게시글 수정
+    //  게시글 수정
     @Transactional
-    public PostUpdateResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, MemberDetails memberDetails) {
+    public ResponseEntity<PostUpdateResponseDto> updatePost(Long postId, PostUpdateRequestDto requestDto, MemberDetails memberDetails) {
         // 로그인된 사용자 정보가 필요
 //        Member member = memberDetails.getMember();  // 영속성이 없는 상태
 
@@ -160,20 +175,30 @@ public class PostService {
         // 1. 로그인된 회원의 게시글 목록에서 수정할 postId의 게시글을 찾아온다.
         Post findPost = member.findPost(postId);
         if (findPost == null) {
-            throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
+//            throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
+            return new ResponseEntity<>(
+                    PostUpdateResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         // 2. 가져온 Post를 requestDto로 값을 바꿔준다.
         findPost.updatePost(requestDto);
 
-        return PostUpdateResponseDto.builder()
-                .status("200")
-                .build();
+        return new ResponseEntity<>(
+                PostUpdateResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
-//     게시글 삭제
+    //     게시글 삭제
     @Transactional
-    public PostDeleteResponseDto deletePost(Long postId, MemberDetails memberDetails) {
+    public ResponseEntity<PostDeleteResponseDto> deletePost(Long postId, MemberDetails memberDetails) {
         // 로그인된 사용자 정보가 필요
         Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
                 () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
@@ -184,25 +209,42 @@ public class PostService {
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
-            throw new RuntimeException("삭제할 수 없습니다.");
+//            throw new RuntimeException("삭제할 수 없습니다.");
+            return new ResponseEntity<>(
+                    PostDeleteResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
         }
 
         // 위의 예외처리를 통과하면 일치하는 사용자이므로, 해당 게시글을 삭제한다.
         postRepository.deleteById(postId);
 
-        return PostDeleteResponseDto.builder()
-                .status("200")
-                .build();
+        return new ResponseEntity<>(
+                PostDeleteResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+
     }
 
     // 관리자, 게시글 삭제 기능
     @Transactional
-    public PostDeleteResponseDto adminDeletePost(Long postId) {
-
+    public ResponseEntity<PostDeleteResponseDto> adminDeletePost(Long postId, MemberDetails memberDetails) {
+        if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+            return new ResponseEntity<>(
+                    PostDeleteResponseDto.builder()
+                            .status(StatusMessage.UNAUTHORIZED_USER)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.UNAUTHORIZED_USER)
+            );
+        }
         /**
          * 관리자가 임의로 게시글을 삭제한다.
          * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
-        */
+         */
         Post findPost = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         );
@@ -211,13 +253,22 @@ public class PostService {
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
-            throw new RuntimeException("삭제할 수 없습니다.");
+//            throw new RuntimeException("삭제할 수 없습니다.");
+            return new ResponseEntity<>(
+                    PostDeleteResponseDto.builder()
+                            .status(StatusMessage.FORBIDDEN_USER)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
+            );
         }
 
         postRepository.deleteById(postId);
 
-        return PostDeleteResponseDto.builder()
-                .status("200")
-                .build();
+        return new ResponseEntity<>(
+                PostDeleteResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
     }
 }
