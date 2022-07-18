@@ -2,11 +2,14 @@ package com.igocst.coco.service;
 
 import com.igocst.coco.common.status.StatusCode;
 import com.igocst.coco.common.status.StatusMessage;
+import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
+import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.dto.post.PostReadResponseDto;
+import com.igocst.coco.repository.CommentRepository;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.s3.S3Service;
@@ -34,6 +37,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private static final String ADMIN_TOKEN = "sflIQ7FG381ei013i/SDGLYFuFua";   // 임시 관리자 토큰
 
     // 로그인
@@ -322,7 +326,7 @@ public class MemberService {
     public ResponseEntity<List<PostReadResponseDto>> readMyPosts(MemberDetails memberDetails) {
 
         // 1. 로그인한 사용자의 게시글 전부 가져와서 반환
-        List<Post> posts = postRepository.findAllByAndAndMember_Id(memberDetails.getMember().getId());
+        List<Post> posts = postRepository.findAllByMember_Id(memberDetails.getMember().getId());
 //        List<Post> posts = memberDetails.getMember().getPosts();
         List<PostReadResponseDto> postList = new ArrayList<>();
         for (Post post : posts) {
@@ -342,6 +346,25 @@ public class MemberService {
             );
         }
         return new ResponseEntity<>(postList, HttpStatus.valueOf(StatusCode.SUCCESS));
+
+    }
+
+    public ResponseEntity<List<CommentReadResponseDto>> readMyComments(MemberDetails memberDetails) {
+        // 1. 로그인한 사용자의 모든 댓글을 가져와서 반환
+        List<Comment> comments = commentRepository.findAllByMember_Id(memberDetails.getMember().getId());
+        List<CommentReadResponseDto> commentList = new ArrayList<>();
+        for (Comment comment : comments) {
+            commentList.add(CommentReadResponseDto.builder()
+                    .id(comment.getId())
+                    .postId(comment.getPost().getId())
+                    .comments(comment.getContent())
+                    .nickname(comment.getMember().getNickname())
+                    //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
+                    .createDate(comment.getCreateDate())
+                    .status(StatusMessage.SUCCESS)
+                    .build());
+        }
+        return new ResponseEntity<>(commentList, HttpStatus.valueOf(StatusCode.SUCCESS));
 
     }
 }
