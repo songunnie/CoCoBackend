@@ -164,9 +164,9 @@ public class MemberService {
             );
         }
 
-        if(memberRepository.findByNickname(memberUpdateRequestDto.getNickname()).isPresent()) {
-            throw new IllegalArgumentException("중복된 닉네임을 가진 회원이 존재합니다.");
-        }
+//        if(memberRepository.findByNickname(memberUpdateRequestDto.getNickname()).isPresent()) {
+//            throw new IllegalArgumentException("중복된 닉네임을 가진 회원이 존재합니다.");
+//        }
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
@@ -277,17 +277,37 @@ public class MemberService {
         );
     }
 
-    //프로필 모달에서 닉네임 중복체크
-//    public CheckDupResponseDto checkNicknameDupProfile(CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
-//
-//        //닉네임이 기존 닉네임과 같지 않을 때 동작
-//        String nickname = checkNicknameDupRequestDto.getNickname();
-//        if (nickname != checkNicknameDupRequestDto.getNickname()) {
-//            boolean isDup = memberRepository.findByNickname(nickname).isPresent();
-//        }
-//
-//        return CheckDupResponseDto.builder()
-//                .isDup(isDup)
-//                .build();
-//    }
+    // 프로필 모달에서 닉네임 중복체크
+    public ResponseEntity<CheckDupResponseDto>  checkNicknameDupProfile(CheckNicknameDupRequestDto checkNicknameDupRequestDto,
+                                                                        MemberDetails memberDetails) {
+
+        // 찾은 멤버의 아이디로 멤버를 찾았으면, 멤버의 기존 닉네임을 얻어올 수 있다.
+        Member member = memberRepository.findById(memberDetails.getMember().getId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+
+        //닉네임이 기존 닉네임과 같지 않을 때 동작
+        String nickname = checkNicknameDupRequestDto.getNickname();
+        //중복이면 true, 아니면 false
+        boolean isDup = false;
+
+        //받은 닉네임과 기존 닉네임이 다르면 = 닉네임을 바꾼것.
+        //닉네임을 안바꾸면 if문을 안돌게 된다.
+        //.equals는 주소값이 아니라 그 안에 들은 값을 직접 비교한다.
+
+        if (memberRepository.findByNickname(nickname).isPresent()) {
+            isDup = true;
+        }
+
+        if (nickname.equals(member.getNickname())) {
+            isDup = false;
+        }
+
+        return new ResponseEntity<>(
+                CheckDupResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .isDup(isDup)
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+    }
 }
