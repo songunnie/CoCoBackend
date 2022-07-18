@@ -47,6 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // cors 때문에 추가
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/register/**").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/post/list").permitAll()
                 .antMatchers("/post/recruit/list").permitAll()

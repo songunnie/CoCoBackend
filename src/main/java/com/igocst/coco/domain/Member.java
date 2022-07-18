@@ -198,6 +198,10 @@ public class Member extends Timestamped {
         this.introduction = introduction;
     }
 
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
     // 북마크
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     @Builder.Default

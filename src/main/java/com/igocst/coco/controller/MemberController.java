@@ -2,6 +2,7 @@ package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.member.*;
+import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,16 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
+
+    private final S3Service s3Service;
 
     // 로그인
     @PostMapping("/login")
@@ -36,12 +41,14 @@ public class MemberController {
     public ResponseEntity<MemberReadResponseDto> readMember(@AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.readMember(memberDetails);
     }
+
     //회원 정보 수정
     @PutMapping("/user")
     public ResponseEntity<MemberUpdateResponseDto> updateMember(@RequestBody MemberUpdateRequestDto memberUpdateRequestDto,
-                                                @AuthenticationPrincipal MemberDetails memberDetails) {
+                                                                @AuthenticationPrincipal MemberDetails memberDetails) throws IOException {
         return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
+
 
     // 회원 탈퇴
     @DeleteMapping("/user")
@@ -65,6 +72,12 @@ public class MemberController {
     // 닉네임 중복 체크
     @PostMapping("/register/check-nickname")
     public ResponseEntity<CheckDupResponseDto> checkNicknameDup(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
+        return memberService.checkNicknameDup(checkNicknameDupRequestDto);
+    }
+
+    // 프로필 모달 닉네임 중복 체크
+    @PutMapping("/user/check-nickname")
+    public ResponseEntity<CheckDupResponseDto> checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto) {
         return memberService.checkNicknameDup(checkNicknameDupRequestDto);
     }
 }
