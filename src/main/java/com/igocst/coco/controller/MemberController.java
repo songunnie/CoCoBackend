@@ -1,6 +1,7 @@
 package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
+import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.s3.S3Service;
@@ -88,5 +89,11 @@ public class MemberController {
     @GetMapping("/profile/posts")
     public ResponseEntity<List<PostReadResponseDto>> readMyPosts(@AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.readMyPosts(memberDetails);
+    }
+
+    // 자신이 작성한 댓글 프로필에서 보여주기
+    @GetMapping("/profile/comments")
+    public ResponseEntity<List<CommentReadResponseDto>> readMyComments(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.readMyComments(memberDetails);
     }
 }

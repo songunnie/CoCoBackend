@@ -12,7 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 모집 중인 게시글만 가져온다.
     List<Post> findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
     List<Post> findAllByOrderByLastModifiedDateDesc();
-    List<Post> findAllByAndAndMember_Id(Long id);
+    List<Post> findAllByMember_Id(Long id);
 
     @Transactional
     @Modifying
