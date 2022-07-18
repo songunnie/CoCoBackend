@@ -101,6 +101,7 @@ public class PostService {
                         .githubUrl(findPost.getMember().getGithubUrl())
                         .portfolioUrl(findPost.getMember().getPortfolioUrl())
                         .introduction(findPost.getMember().getIntroduction())
+                        .profileImageUrl(findPost.getMember().getProfileImageUrl())
                         .enableUpdate(enableUpdate)
                         .enableDelete(enableDelete)
                         .memberRole(memberRole)
