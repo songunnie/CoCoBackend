@@ -4,8 +4,11 @@ import com.igocst.coco.common.status.StatusCode;
 import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
+import com.igocst.coco.domain.Post;
 import com.igocst.coco.dto.member.*;
+import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.repository.MemberRepository;
+import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class MemberService {
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
     private static final String ADMIN_TOKEN = "sflIQ7FG381ei013i/SDGLYFuFua";   // 임시 관리자 토큰
 
     // 로그인
@@ -309,5 +315,33 @@ public class MemberService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
+    }
+
+    // 자신이 작성한 게시글 프로필에서 보여주기
+    @Transactional
+    public ResponseEntity<List<PostReadResponseDto>> readMyPosts(MemberDetails memberDetails) {
+
+        // 1. 로그인한 사용자의 게시글 전부 가져와서 반환
+        List<Post> posts = postRepository.findAllByAndAndMember_Id(memberDetails.getMember().getId());
+//        List<Post> posts = memberDetails.getMember().getPosts();
+        List<PostReadResponseDto> postList = new ArrayList<>();
+        for (Post post : posts) {
+            postList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getLastModifiedDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(postList, HttpStatus.valueOf(StatusCode.SUCCESS));
+
     }
 }

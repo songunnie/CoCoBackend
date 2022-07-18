@@ -2,6 +2,7 @@ package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.member.*;
+import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MemberService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -80,5 +82,11 @@ public class MemberController {
     public ResponseEntity<CheckDupResponseDto> checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto,
                                                                        @AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.checkNicknameDupProfile(checkNicknameDupRequestDto, memberDetails);
+    }
+
+    // 자신이 작성한 게시글 프로필에서 보여주기
+    @GetMapping("/profile/posts")
+    public ResponseEntity<List<PostReadResponseDto>> readMyPosts(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return memberService.readMyPosts(memberDetails);
     }
 }
