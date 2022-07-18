@@ -20,4 +20,5 @@ public class CommentReadResponseDto {
     private boolean enableDelete;
     // 관리자 여부 체크
     private MemberRole memberRole;
+    private String profileImageUrl;
 }

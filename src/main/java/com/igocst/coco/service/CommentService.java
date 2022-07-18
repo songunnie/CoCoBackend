@@ -89,6 +89,7 @@ public class CommentService {
                     .comments(c.getContent())
                     .nickname(c.getMember().getNickname())
                     //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
+                    .profileImageUrl(c.getMember().getProfileImageUrl())
                     .createDate(c.getCreateDate())
                     .status(StatusMessage.SUCCESS)
                     .enableDelete(enableDelete)
