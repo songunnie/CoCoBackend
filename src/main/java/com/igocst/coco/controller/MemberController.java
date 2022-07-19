@@ -4,7 +4,6 @@ import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.dto.post.PostReadResponseDto;
-import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -22,8 +20,6 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
-
-    private final S3Service s3Service;
 
     // 로그인
     @PostMapping("/login")
@@ -79,20 +75,20 @@ public class MemberController {
     }
 
     // 프로필 모달 닉네임 중복 체크
-    @PutMapping("/user/check-nickname")
+    @PutMapping("/user/profile/check-nickname")
     public ResponseEntity<CheckDupResponseDto> checkNicknameDupProfile(@RequestBody CheckNicknameDupRequestDto checkNicknameDupRequestDto,
                                                                        @AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.checkNicknameDupProfile(checkNicknameDupRequestDto, memberDetails);
     }
 
     // 자신이 작성한 게시글 프로필에서 보여주기
-    @GetMapping("/profile/posts")
+    @GetMapping("/user/profile/posts")
     public ResponseEntity<List<PostReadResponseDto>> readMyPosts(@AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.readMyPosts(memberDetails);
     }
 
     // 자신이 작성한 댓글 프로필에서 보여주기
-    @GetMapping("/profile/comments")
+    @GetMapping("/user/profile/comments")
     public ResponseEntity<List<CommentReadResponseDto>> readMyComments(@AuthenticationPrincipal MemberDetails memberDetails) {
         return memberService.readMyComments(memberDetails);
     }

@@ -3,7 +3,6 @@ package com.igocst.coco.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.igocst.coco.domain.timestamped.Timestamped;
 import lombok.*;
-
 import javax.persistence.*;
 
 @Entity
@@ -30,22 +29,4 @@ public class Comment extends Timestamped {
 
     @Column(nullable = false)
     private String content;
-
-    public void addMember(Member member) {
-        this.member = member;
-        member.getComments().add(this);
-    }
-
-    //Comment에서 하면 동작은 하지만 두번 타는 코드를 짜게된다.
-//    public void changePost(Post post) {
-//        this.post = post;
-//        post.getComments().add(this);
-//    }
 }
-
-// 단방향
-// 의도치 않은 테이블 생성
-// 쿼리가 두번 날라간다 insert, update
-
-// 양방향
-// 객체지향적으로 좋진 않지만 쿼리가 두번 나갈바엔 이게 낫다

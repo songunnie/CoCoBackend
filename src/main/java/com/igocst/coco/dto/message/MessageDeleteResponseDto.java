@@ -6,7 +6,6 @@ import lombok.Getter;
 @Builder
 @Getter
 public class MessageDeleteResponseDto {
-//    private Long messageId;
     private String status;
 }
 

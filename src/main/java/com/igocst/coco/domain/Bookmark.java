@@ -1,7 +1,6 @@
 package com.igocst.coco.domain;
 
 import lombok.*;
-
 import javax.persistence.*;
 
 @Entity
@@ -19,7 +18,7 @@ public class Bookmark {
 
     //FK
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "POST_ID") //생략가능하지만 안하는게 좋음
+    @JoinColumn(name = "POST_ID")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)

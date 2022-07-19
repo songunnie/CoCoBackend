@@ -47,14 +47,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // cors 때문에 추가
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/register/**").permitAll()
-                .antMatchers("/user/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/post/list").permitAll()
                 .antMatchers("/post/recruit/list").permitAll()
                 // 이외의 URI는 인증을 거친다.
                 .anyRequest()
-                .permitAll()
-//                .authenticated()
+                .authenticated()
                 .and()
                 .formLogin().disable()
                 // JWT 필터를 추가, 요청이 올때마다 JWT 토큰을 검사한다.

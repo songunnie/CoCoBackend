@@ -16,8 +16,7 @@ import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.MultipartStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +26,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,19 +38,27 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private static final String ADMIN_TOKEN = "sflIQ7FG381ei013i/SDGLYFuFua";   // 임시 관리자 토큰
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${secret.admin.token}")
+    private String ADMIN_TOKEN;   // 임시 관리자 토큰
 
     // 로그인
     public ResponseEntity<LoginResponseDto> login(LoginRequestDto requestDto) {
         // requestDto에 담긴 로그인 정보들이 DB에 있는지 확인
-        Member findMember = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(
-                () -> new IllegalArgumentException("일치하는 사용자가 없습니다.")
-//                () -> new ResponseEntity<>(StatusMessage.INVALID_PARAM, HttpStatus.valueOf(StatusCode.INVALID_PARAM))
-        );
+        Optional<Member> memberOptional = memberRepository.findByEmail(requestDto.getEmail());
+        if (memberOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    LoginResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
+        Member findMember = memberOptional.get();
 
         // BCrypt으로 암호화된 비밀번호를 비교
         if (!passwordEncoder.matches(requestDto.getPassword(), findMember.getPassword())) {
-//            throw new IllegalArgumentException("유효하지 않은 비밀번호");
             return new ResponseEntity<>(
                     LoginResponseDto.builder()
                             .status(StatusMessage.INVALID_PARAM)
@@ -60,8 +68,8 @@ public class MemberService {
         }
 
         // JWT 토큰 만들어서 반환하기
-        String token = JwtTokenProvider.generateToken(requestDto.getEmail());
-//        log.info(token);
+        String token = jwtTokenProvider.generateToken(requestDto.getEmail());
+
         return new ResponseEntity<>(
                 LoginResponseDto.builder()
                     .status(StatusMessage.SUCCESS)
@@ -69,9 +77,6 @@ public class MemberService {
                     .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-//        return LoginResponseDto.builder()
-//                .token(token)
-//                .build();
     }
 
 
@@ -85,7 +90,6 @@ public class MemberService {
                             .build(),
                     HttpStatus.valueOf(StatusCode.DUPLICATED_USER)
             );
-//            IllegalArgumentException("중복된 이메일을 가진 회원이 존재합니다.");
         }
 
         // 회원 DB에 중복된 닉네임이 있으면 에러
@@ -102,7 +106,6 @@ public class MemberService {
         MemberRole role = MemberRole.MEMBER;
         if (requestDto.isAdmin()) {
             if (!requestDto.getAdminToken().equals(ADMIN_TOKEN)) {
-//                throw new IllegalArgumentException("관리자 토큰이 일치하지 않습니다.");
                 return new ResponseEntity<>(
                         RegisterResponseDto.builder()
                                 .status(StatusMessage.INVALID_PARAM)
@@ -138,8 +141,7 @@ public class MemberService {
 
     //회원 정보 획득
     public ResponseEntity<MemberReadResponseDto> readMember(MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+        Member member = memberDetails.getMember();
 
         return new ResponseEntity<>(
                 MemberReadResponseDto.builder()
@@ -160,23 +162,10 @@ public class MemberService {
     public ResponseEntity<MemberUpdateResponseDto> updateMember(MemberUpdateRequestDto memberUpdateRequestDto,
                                                 MemberDetails memberDetails) throws IOException {
 
+        // acid
         //멤버를 찾고
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
-
-        if (member == null) {
-//            throw new RuntimeException("프로필 수정 권한이 없습니다.");
-            return new ResponseEntity<>(
-                    MemberUpdateResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
-                            .build(),
-                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
-            );
-        }
-
-//        if(memberRepository.findByNickname(memberUpdateRequestDto.getNickname()).isPresent()) {
-//            throw new IllegalArgumentException("중복된 닉네임을 가진 회원이 존재합니다.");
-//        }
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
@@ -191,19 +180,12 @@ public class MemberService {
         // TODO: Step 3. DB에 저장하기(반환된 S3에 저장되어있는 url을 DB에 저장)
         // TODO: Step 4. 왜 IOException 같은 예외처리를 해줘야했는지 설명할 수 있을 정도로 파악해보기.
 
-        // 이전과 달라진 내용만 DB애 upload될 수 있도록 / client단에서 체크를해도됨
-        //  but + 백엔드에서만 체크를하면 더 좋을듯...
-
         // TODO: password 수정하려면 기존 비번 확인하는거 필요, imageUrl도 추가해야함.
         //그 멤버의 정보를 바꾼다.
         member.updateNickname(memberUpdateRequestDto.getNickname());
         member.updateGithubUrl(memberUpdateRequestDto.getGithubUrl());
         member.updatePortfolioUrl(memberUpdateRequestDto.getPortfolioUrl());
         member.updateIntroduction(memberUpdateRequestDto.getIntroduction());
-        //updateRequestDto단에서 ProfileImageUrl 받을 이유가 없응.
-//        member.updateProfileImage(memberUpdateRequestDto.getProfileImageUrl());
-
-        memberRepository.save(member);
 
         return new ResponseEntity<>(
                 MemberUpdateResponseDto.builder()
@@ -216,23 +198,7 @@ public class MemberService {
     // 회원 탈퇴
     @Transactional
     public ResponseEntity<MemberDeleteResponseDto> deleteMember(MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("회원이 아닙니다."));
-
-        if (member == null) {
-//            throw new NullPointerException("회원이 아닙니다.");
-            return new ResponseEntity<>(
-                    MemberDeleteResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
-                            .build(),
-                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
-            );
-        }
-
-//        if (member.getId() != userId) {  // 예외처리를 이정도로 해줘야 하는지, 안해도 되는건지 모르겠음.
-//            throw new IllegalArgumentException("권한이 없습니다.");
-//        }
-
+        Member member = memberDetails.getMember();
         memberRepository.deleteById(member.getId());
 
         return new ResponseEntity<>(
@@ -242,8 +208,6 @@ public class MemberService {
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
-
-
 
     // 관리자, 회원 강제 탈퇴
     public ResponseEntity<MemberDeleteResponseDto> adminDeleteMember(Long userId) {
@@ -292,8 +256,7 @@ public class MemberService {
                                                                         MemberDetails memberDetails) {
 
         // 찾은 멤버의 아이디로 멤버를 찾았으면, 멤버의 기존 닉네임을 얻어올 수 있다.
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+        Member member = memberDetails.getMember();
 
         //닉네임이 기존 닉네임과 같지 않을 때 동작
         String nickname = checkNicknameDupRequestDto.getNickname();
@@ -327,7 +290,6 @@ public class MemberService {
 
         // 1. 로그인한 사용자의 게시글 전부 가져와서 반환
         List<Post> posts = postRepository.findAllByMember_Id(memberDetails.getMember().getId());
-//        List<Post> posts = memberDetails.getMember().getPosts();
         List<PostReadResponseDto> postList = new ArrayList<>();
         for (Post post : posts) {
             postList.add(PostReadResponseDto.builder()
@@ -359,7 +321,6 @@ public class MemberService {
                     .postId(comment.getPost().getId())
                     .comments(comment.getContent())
                     .nickname(comment.getMember().getNickname())
-                    //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
                     .createDate(comment.getCreateDate())
                     .status(StatusMessage.SUCCESS)
                     .build());

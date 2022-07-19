@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -30,13 +31,10 @@ public class PostService {
     // 게시글 생성
     @Transactional
     public ResponseEntity<PostSaveResponseDto> createPost(PostSaveRequestDto postSaveRequestDto, MemberDetails memberDetails) {
-        // 어떤 회원이 게시글을 작성할건지 (로그인 되어있는 회원)
-
         // 1. 회원 id 가져온다
         // 2. 회원-게시글 연관관계 메소드를 사용해서 양쪽에 값을 넣어준다 (Member, Post)
-        Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 회원 ID가 업습니다.")
-        );
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         Post post = Post.builder()
                 .title(postSaveRequestDto.getTitle())
@@ -48,7 +46,6 @@ public class PostService {
 
         // 회원과 게시글 연관관계 메소드 사용해서 넣어줌
         member.addPost(post);   // 양방향 값 세팅
-//        post.addMember(member);  // 양방향 값 세팅
         postRepository.save(post);
 
         return new ResponseEntity<>(
@@ -60,12 +57,22 @@ public class PostService {
     }
 
     // 게시글 내용(상세) 조회
+    @Transactional
     public ResponseEntity<PostReadResponseDto> readPost(Long postId, MemberDetails memberDetails) {
         // 로그인된 사용자의 정보가 필요 (로그인된 사용자가 아니면 접근 불가, JWT로 인증이 안되면 접근 불가)
 
         // 1. postId에 해당하는 게시글 조회
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    PostReadResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
+        Post findPost = postOptional.get();
+
         boolean enableUpdate = false;
         boolean enableDelete = false;
 
@@ -81,7 +88,6 @@ public class PostService {
             memberRole = MemberRole.ADMIN;
             enableDelete = true;
         }
-
 
         postRepository.updateHits(postId);
 
@@ -164,19 +170,13 @@ public class PostService {
     //  게시글 수정
     @Transactional
     public ResponseEntity<PostUpdateResponseDto> updatePost(Long postId, PostUpdateRequestDto requestDto, MemberDetails memberDetails) {
-        // 로그인된 사용자 정보가 필요
-//        Member member = memberDetails.getMember();  // 영속성이 없는 상태
-
-        // 영속성이 있는 상태
-        Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
-                () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
-        );
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         // Member와 Post는 연관관계가 맺어져 있으므로, Member에 Post가 있다
         // 1. 로그인된 회원의 게시글 목록에서 수정할 postId의 게시글을 찾아온다.
-        Post findPost = member.findPost(postId);
-        if (findPost == null) {
-//            throw new RuntimeException("회원님이 작성한 게시글을 찾을 수 없습니다.");  // 어떤 예외처리를 해야할 지 잘 모르겠어서 일단 Exception
+        Optional<Post> postOptional = member.findPost(postId);
+        if (postOptional.isEmpty()) {
             return new ResponseEntity<>(
                     PostUpdateResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -184,6 +184,7 @@ public class PostService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
+        Post findPost = postOptional.get();
 
         // 2. 가져온 Post를 requestDto로 값을 바꿔준다.
         findPost.updatePost(requestDto);
@@ -200,17 +201,14 @@ public class PostService {
     //     게시글 삭제
     @Transactional
     public ResponseEntity<PostDeleteResponseDto> deletePost(Long postId, MemberDetails memberDetails) {
-        // 로그인된 사용자 정보가 필요
-        Member member = memberRepository.findById(memberDetails.getMember().getId()).orElseThrow(
-                () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
-        );
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         // 연관관계 메소드
         // 1. 해당 게시글(postId)을 작성한, 로그인된 사용자(member)가 해당 게시글(postId)을 삭제한다. (postId, memberId)
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
-//            throw new RuntimeException("삭제할 수 없습니다.");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -237,32 +235,37 @@ public class PostService {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
-                            .status(StatusMessage.UNAUTHORIZED_USER)
+                            .status(StatusMessage.FORBIDDEN_USER)
                             .build(),
-                    HttpStatus.valueOf(StatusCode.UNAUTHORIZED_USER)
+                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
             );
         }
         /**
          * 관리자가 임의로 게시글을 삭제한다.
          * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
          */
-        Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        );
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    PostDeleteResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
+        Post findPost = postOptional.get();
 //
         Member member = findPost.getMember();
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
-//            throw new RuntimeException("삭제할 수 없습니다.");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
+                            .status(StatusMessage.BAD_REQUEST)
                             .build(),
-                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         postRepository.deleteById(postId);
 
         return new ResponseEntity<>(

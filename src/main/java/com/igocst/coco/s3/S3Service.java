@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,9 +40,7 @@ public class S3Service {
         }
     }
     private String upload(File uploadFile, String dirName, MemberDetails memberDetails) throws NoSuchAlgorithmException {
-        //filename을 받고 -> uploadImageUrl을 반환 받음
-        // 난수화를 위해 UUID 사용
-//        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();
+        //filename로 받고 -> uploadImageUrl을 반환 받음
         String fileName = memberDetails.getNickname();
         String cryptogram = encrypt(fileName);// S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, dirName+"/"+cryptogram); // s3로 업로드
@@ -75,13 +72,6 @@ public class S3Service {
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
-//    private void delete(String fileKey) {
-//        amazonS3Client.deleteObject(bucket, fileKey);
-//    }
-//   public String reupload(MultipartFile file, String currentFilePath, String imageKey) {
-//        String fileName =
-//    }
-
     // 로컬에 저장된 이미지 지우기
     // 임시로 생성된 new file을 삭제해준다!
     private void removeNewFile(File targetFile) {
@@ -94,7 +84,7 @@ public class S3Service {
     }
 
     // 로컬에 파일 업로드 하기
-    //multipartFile을 File타입으로 변환해줌 (변환된 파일을 가지고 put을 해주면 됨) -> ?왓..난 이미 put했는데..!
+    //multipartFile을 File타입으로 변환해줌 (변환된 파일을 가지고 put을 해주면 됨)
     private Optional<File> convert(MultipartFile file) throws IOException {
         File convertFile = new File(System.getProperty("user.dir") + "/" + file.getOriginalFilename());
         if (convertFile.createNewFile()) { // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
@@ -103,7 +93,6 @@ public class S3Service {
             }
             return Optional.of(convertFile);
         }
-
         return Optional.empty();
     }
 }

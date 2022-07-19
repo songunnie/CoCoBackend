@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,30 +16,34 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/comment/{post_id}")
+    // 댓글 작성
+    @PostMapping("/{postId}/comment")
     public ResponseEntity<CommentCreateResponseDto> createComment(@RequestBody CommentCreateRequestDto commentCreateRequestDto,
-                                                                 @PathVariable Long post_id,
+                                                                 @PathVariable Long postId,
                                                                  @AuthenticationPrincipal MemberDetails memberDetails) {
-        return commentService.join(commentCreateRequestDto, post_id, memberDetails);
+        return commentService.createComment(commentCreateRequestDto, postId, memberDetails);
     }
 
-    @GetMapping("/comment/list/{post_id}")
-    public ResponseEntity<List<CommentReadResponseDto>> readComment(@PathVariable Long post_id,
+    // 댓글 조회
+    @GetMapping("/{postId}/comment/list")
+    public ResponseEntity<List<CommentReadResponseDto>> readComment(@PathVariable Long postId,
                                                     @AuthenticationPrincipal MemberDetails memberDetails) {
-        return commentService.readCommentList(post_id, memberDetails);
+        return commentService.readCommentList(postId, memberDetails);
     }
 
-    @PutMapping("/comment/{comment_id}")
+    // 댓글 수정
+    @PutMapping("/comment/{commentId}")
     public ResponseEntity<CommentUpdateResponseDto> updateComment(@RequestBody CommentUpdateRequestDto commentUpdateRequestDto,
-                                                  @PathVariable Long comment_id,
+                                                  @PathVariable Long commentId,
                                                   @AuthenticationPrincipal MemberDetails memberDetails) {
-        return commentService.updateComment(commentUpdateRequestDto, comment_id, memberDetails);
+        return commentService.updateComment(commentUpdateRequestDto, commentId, memberDetails);
     }
 
-    @DeleteMapping("/comment/{comment_id}")
-    public ResponseEntity<CommentDeleteResponseDto> deleteComment(@PathVariable Long comment_id,
+    // 댓글 삭제
+    @DeleteMapping("/comment/{commentId}")
+    public ResponseEntity<CommentDeleteResponseDto> deleteComment(@PathVariable Long commentId,
                                                   @AuthenticationPrincipal MemberDetails memberDetails){
-        return commentService.deleteComment(comment_id, memberDetails); //.removeCommentById? vs removeComment
+        return commentService.deleteComment(commentId, memberDetails); //.removeCommentById? vs removeComment
     }
 
     // 관리자, 댓글 삭제

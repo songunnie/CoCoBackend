@@ -3,7 +3,6 @@ package com.igocst.coco.domain;
 import com.igocst.coco.domain.timestamped.Timestamped;
 import com.igocst.coco.dto.post.PostUpdateRequestDto;
 import lombok.*;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,6 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String contact;
 
-    // TODO: 모집 완료 = true, 모집 중 = false ?
     @Column(nullable = false)
     private boolean recruitmentState;
 
@@ -58,20 +56,10 @@ public class Post extends Timestamped {
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     /**
-     * 연관관계 편의 메소드
-     */
-    // 게시글
-    // 어떤 회원의 게시글인지
-    public void addMember(Member member) {
-        this.member = member;
-        member.getPosts().add(this);
-    }
-
-    /**
      * 비즈니스 로직
-     * @param requestDto
      * 게시글 수정
      */
+
     public void updatePost(PostUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();

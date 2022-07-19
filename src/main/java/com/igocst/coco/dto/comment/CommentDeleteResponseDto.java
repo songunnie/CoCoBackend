@@ -1,6 +1,5 @@
 package com.igocst.coco.dto.comment;
 
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +8,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CommentDeleteResponseDto {
-//    private Long id;
     private String status;
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -17,9 +16,9 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("/message")
-    public ResponseEntity<MessageCreateResponseDto> create(@RequestBody MessageCreateRequestDto messageCreateRequestDto,
+    public ResponseEntity<MessageCreateResponseDto> createMessage(@RequestBody MessageCreateRequestDto messageCreateRequestDto,
                                                           @AuthenticationPrincipal MemberDetails memberDetails) {
-        return  messageService.join(messageCreateRequestDto, memberDetails);
+        return  messageService.createMessage(messageCreateRequestDto, memberDetails);
     }
 
     @GetMapping("/message/{messageId}")
