@@ -11,6 +11,7 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
@@ -35,6 +37,15 @@ public class PostService {
         // 2. 회원-게시글 연관관계 메소드를 사용해서 양쪽에 값을 넣어준다 (Member, Post)
         Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
         Member member = memberOptional.get();
+
+        // 게시글 길이 2000자 제한
+        if (postSaveRequestDto.getContent().length() > 2000) {
+            log.error("nickname={}, error={}", member.getNickname(), "게시글 길이 2000자 초과");
+            return new ResponseEntity<>(
+                    PostSaveResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
 
         Post post = Post.builder()
                 .title(postSaveRequestDto.getTitle())
@@ -64,6 +75,7 @@ public class PostService {
         // 1. postId에 해당하는 게시글 조회
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
+            log.error("nickname={}, error={}", memberDetails.getNickname(), "해당 게시글 존재하지 않음");
             return new ResponseEntity<>(
                     PostReadResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -176,7 +188,9 @@ public class PostService {
         // Member와 Post는 연관관계가 맺어져 있으므로, Member에 Post가 있다
         // 1. 로그인된 회원의 게시글 목록에서 수정할 postId의 게시글을 찾아온다.
         Optional<Post> postOptional = member.findPost(postId);
+
         if (postOptional.isEmpty()) {
+            log.error("nickname={}, error={}", member.getNickname(), "수정할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
                     PostUpdateResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -186,6 +200,13 @@ public class PostService {
         }
         Post findPost = postOptional.get();
 
+        if (requestDto.getContent().length() > 2000) {
+            log.error("nickname={}, error={}", member.getNickname(), "게시글 길이 2000자 초과");
+            return new ResponseEntity<>(
+                    PostUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
         // 2. 가져온 Post를 requestDto로 값을 바꿔준다.
         findPost.updatePost(requestDto);
 
@@ -209,6 +230,7 @@ public class PostService {
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
+            log.error("nickname={}, error={}", member.getNickname(), "삭제할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -233,6 +255,7 @@ public class PostService {
     @Transactional
     public ResponseEntity<PostDeleteResponseDto> adminDeletePost(Long postId, MemberDetails memberDetails) {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+            log.error("nickname={}, error={}", memberDetails.getNickname(), "관리자 권한이 없음");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
                             .status(StatusMessage.FORBIDDEN_USER)
@@ -246,6 +269,7 @@ public class PostService {
          */
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
+            log.error("nickname={}, error={}", memberDetails.getNickname(), "해당 게시글이 존재하지 않음");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -259,6 +283,7 @@ public class PostService {
         boolean isValid = member.deletePost(postId);
 
         if(!isValid) {
+            log.error("nickname={}, error={}", memberDetails.getNickname(), "삭제할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
                     PostDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)

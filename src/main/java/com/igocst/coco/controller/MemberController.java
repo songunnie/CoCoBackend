@@ -7,6 +7,7 @@ import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,6 +46,7 @@ public class MemberController {
     @PutMapping("/user")
     public ResponseEntity<MemberUpdateResponseDto> updateMember(@ModelAttribute MemberUpdateRequestDto memberUpdateRequestDto,
                                                                 @AuthenticationPrincipal MemberDetails memberDetails) throws IOException {
+
         return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
 

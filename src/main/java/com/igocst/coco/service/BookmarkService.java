@@ -11,6 +11,7 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
@@ -37,6 +39,7 @@ public class BookmarkService {
 
         Optional<Post> postOptional  = postRepository.findById(postId);
         if(postOptional.isEmpty()) {
+            log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "해당 게시글을 찾을 수 없음");
             return new ResponseEntity<>(
                     BookmarkSaveResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -51,6 +54,7 @@ public class BookmarkService {
 
             // 이미 본인이 저장한 북마크는 또 저장할 수 없음
             if (b.getMember().getId() == memberDetails.getMember().getId()) {
+                log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "이미 북마크에 저장한 게시글");
                 return new ResponseEntity<>(
                         BookmarkSaveResponseDto.builder()
                                 .status(StatusMessage.BAD_REQUEST)
@@ -112,6 +116,7 @@ public class BookmarkService {
         boolean isValid = member.deleteBookmark(bookmarkId);
 
         if(!isValid) {
+            log.error("nickname={}, messageId={}, error={}", member.getNickname(), bookmarkId, "해당 북마크를 찾을 수 없음");
             return new ResponseEntity<>(
                     BookmarkDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)

@@ -6,6 +6,7 @@ import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
+import com.igocst.coco.dto.comment.CommentCreateResponseDto;
 import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.dto.post.PostReadResponseDto;
@@ -16,6 +17,7 @@ import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-//@Slf4j
+@Slf4j
 public class MemberService {
 
     private final S3Service s3Service;
@@ -48,6 +50,7 @@ public class MemberService {
         // requestDto에 담긴 로그인 정보들이 DB에 있는지 확인
         Optional<Member> memberOptional = memberRepository.findByEmail(requestDto.getEmail());
         if (memberOptional.isEmpty()) {
+            log.error("error={}", "로그인 실패");
             return new ResponseEntity<>(
                     LoginResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -59,6 +62,7 @@ public class MemberService {
 
         // BCrypt으로 암호화된 비밀번호를 비교
         if (!passwordEncoder.matches(requestDto.getPassword(), findMember.getPassword())) {
+            log.error("nickname={}, error={}", findMember.getNickname(), "패스워드 오류");
             return new ResponseEntity<>(
                     LoginResponseDto.builder()
                             .status(StatusMessage.INVALID_PARAM)
@@ -69,6 +73,15 @@ public class MemberService {
 
         // JWT 토큰 만들어서 반환하기
         String token = jwtTokenProvider.generateToken(requestDto.getEmail());
+        if (token == null) {
+            log.error("nickname={}, error={}", findMember.getNickname(), "토큰 발급 오류");
+            return new ResponseEntity<>(
+                    LoginResponseDto.builder()
+                            .status(StatusMessage.INVALID_TOKEN)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.INVALID_TOKEN)
+            );
+        }
 
         return new ResponseEntity<>(
                 LoginResponseDto.builder()
@@ -84,6 +97,7 @@ public class MemberService {
     public ResponseEntity<RegisterResponseDto> register(RegisterRequestDto requestDto) {
         // 회원 DB에 중복된 이메일이 있으면 에러
         if (memberRepository.findByEmail(requestDto.getEmail()).isPresent()) {
+            log.error("error={}", "회원가입 시, 이메일 중복 오류");
             return new ResponseEntity<>(
                     RegisterResponseDto.builder()
                             .status(StatusMessage.DUPLICATED_USER)
@@ -94,6 +108,7 @@ public class MemberService {
 
         // 회원 DB에 중복된 닉네임이 있으면 에러
         if (memberRepository.findByNickname(requestDto.getNickname()).isPresent()) {
+            log.error("error={}", "회원가입 시, 닉네임 중복 오류");
             return new ResponseEntity<>(
                     RegisterResponseDto.builder()
                             .status(StatusMessage.DUPLICATED_USER)
@@ -106,6 +121,7 @@ public class MemberService {
         MemberRole role = MemberRole.MEMBER;
         if (requestDto.isAdmin()) {
             if (!requestDto.getAdminToken().equals(ADMIN_TOKEN)) {
+                log.error("error={}", "유효하지 않은 관리자 인증 토큰");
                 return new ResponseEntity<>(
                         RegisterResponseDto.builder()
                                 .status(StatusMessage.INVALID_PARAM)
@@ -166,6 +182,10 @@ public class MemberService {
         //멤버를 찾고
         Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
         Member member = memberOptional.get();
+
+        if (memberUpdateRequestDto.getFile().getSize() > 5242880) {
+            log.error("nickname={}, error={}", member.getNickname(), "파일 크키가 5MB를 초과했습니다");
+        }
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
@@ -327,6 +347,5 @@ public class MemberService {
                     .build());
         }
         return new ResponseEntity<>(commentList, HttpStatus.valueOf(StatusCode.SUCCESS));
-
     }
 }
