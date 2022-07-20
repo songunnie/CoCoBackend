@@ -20,9 +20,11 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public MemberDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-//        Optional<Member> member = memberRepository.findByEmail(email);
-        Member member = memberRepository.findByEmail(email).orElse(null);
-
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        if (memberOptional.isEmpty()) {
+            return null;
+        }
+        Member member = memberOptional.get();
 
         // DB에 일치하는 회원이 있으면 MemberDetails로 보냄
         return new MemberDetails(member);

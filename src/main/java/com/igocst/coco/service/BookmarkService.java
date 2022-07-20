@@ -41,9 +41,7 @@ public class BookmarkService {
         if(postOptional.isEmpty()) {
             log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "해당 게시글을 찾을 수 없음");
             return new ResponseEntity<>(
-                    BookmarkSaveResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    BookmarkSaveResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST));
         }
         Post post = postOptional.get();
@@ -56,9 +54,7 @@ public class BookmarkService {
             if (b.getMember().getId() == memberDetails.getMember().getId()) {
                 log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "이미 북마크에 저장한 게시글");
                 return new ResponseEntity<>(
-                        BookmarkSaveResponseDto.builder()
-                                .status(StatusMessage.BAD_REQUEST)
-                                .build(),
+                        BookmarkSaveResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                         HttpStatus.valueOf(StatusCode.BAD_REQUEST)
                 );
             }
@@ -72,9 +68,7 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
 
         return new ResponseEntity<>(
-                BookmarkSaveResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                BookmarkSaveResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
 
@@ -118,9 +112,7 @@ public class BookmarkService {
         if(!isValid) {
             log.error("nickname={}, messageId={}, error={}", member.getNickname(), bookmarkId, "해당 북마크를 찾을 수 없음");
             return new ResponseEntity<>(
-                    BookmarkDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    BookmarkDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -128,9 +120,7 @@ public class BookmarkService {
         bookmarkRepository.deleteById(bookmarkId);
 
         return new ResponseEntity<>(
-                BookmarkDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                BookmarkDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
 

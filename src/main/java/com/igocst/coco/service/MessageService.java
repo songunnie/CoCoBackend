@@ -150,9 +150,7 @@ public class MessageService {
         if (!isValid) {
             log.error("nickname={}, messageId={}, error={}", member.getNickname(), messageId, "해당 쪽지를 찾을 수 없음");
             return new ResponseEntity<>(
-                    MessageDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    MessageDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -160,9 +158,7 @@ public class MessageService {
         messageRepository.deleteById(messageId);
 
         return new ResponseEntity<>(
-                MessageDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                MessageDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
 

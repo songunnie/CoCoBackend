@@ -1,9 +1,0 @@
-#spring.servlet.multipart.max-file-size: 파일의 최대 사이즈 (default: 1MB)
-#spring.servlet.multipart.max-request-size: 요청의 최대 사이즈 (default: 10MB)
-#spring:
-#  servlet:
-#    multipart:
-#      file-size-threshold: 5MB
-#      location: C:/Temp
-#      max-file-size: 5MB
-#      max-request-size: 5MB

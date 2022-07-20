@@ -33,7 +33,6 @@ public class MemberController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto requestDto) {
         return memberService.register(requestDto);
-//        return new ResponseEntity<>(StatusMessage.SUCCESS, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
     //회원 정보 획득
