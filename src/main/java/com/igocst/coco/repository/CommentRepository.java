@@ -7,5 +7,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     //List로 받아오는 메소드를 하나 더 만들기
     List<Comment> findAllByPostId(Long post_id);
-    List<Comment> findAllByMember_Id(Long id);
+    List<Comment> findAllByMember_IdOrderByLastModifiedDateDesc(Long id);
 }
