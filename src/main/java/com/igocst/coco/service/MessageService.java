@@ -5,10 +5,12 @@ import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.Message;
 import com.igocst.coco.dto.message.*;
+import com.igocst.coco.dto.post.PostSaveResponseDto;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.MessageRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MessageService {
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
@@ -34,6 +37,7 @@ public class MessageService {
 
         Optional<Member> receivedMemberOptional = memberRepository.findByNickname(messageCreateRequestDto.getReceiver());
         if(receivedMemberOptional.isEmpty()) {
+            log.error("nickname={}, error={}", messageCreateRequestDto.getReceiver(), "쪽지 수신자를 찾을 수 없음");
             return new ResponseEntity<>(
                     MessageCreateResponseDto.builder()
                             .status(StatusMessage.SUCCESS)
@@ -43,6 +47,15 @@ public class MessageService {
         };
 
         Member receivedMember = receivedMemberOptional.get();
+
+        // 쪽지 내용 255자 제한
+        if (messageCreateRequestDto.getContent().length() > 255) {
+            log.error("nickname={}, error={}", sendMember.getNickname(), "쪽지 내용 255자 초과");
+            return new ResponseEntity<>(
+                    MessageCreateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
 
         // message 보내는 코드
         Message message = Message.builder()
@@ -74,6 +87,7 @@ public class MessageService {
 
         Optional<Message> messageOptional = member.findMessage(messageId);
         if (messageOptional.isEmpty()) {
+            log.error("nickname={}, messageId={}, error={}", member.getNickname(), messageId, "해당 쪽지를 찾을 수 없음");
             return new ResponseEntity<>(
                     MessageReadResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -134,6 +148,7 @@ public class MessageService {
         boolean isValid = member.deleteMessage(messageId);
 
         if (!isValid) {
+            log.error("nickname={}, messageId={}, error={}", member.getNickname(), messageId, "해당 쪽지를 찾을 수 없음");
             return new ResponseEntity<>(
                     MessageDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)

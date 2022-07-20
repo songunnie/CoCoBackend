@@ -12,6 +12,7 @@ import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -38,6 +40,7 @@ public class CommentService {
         //주인인 Post를 찾고,
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
+            log.error("nickname={}, error={}", member.getNickname(), "해당 게시글을 찾을 수 없음");
             return new ResponseEntity<>(
                     CommentCreateResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -47,6 +50,13 @@ public class CommentService {
         }
         Post post = postOptional.get();
 
+        if (commentCreateRequestDto.getContent().length() > 255) {
+            log.error("nickname={}, error={}", member.getNickname(), "댓글 글자 255자 초과");
+            return new ResponseEntity<>(
+                    CommentCreateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
         //Comment를 하나 만들고
         Comment comment = Comment.builder()
                 .content(commentCreateRequestDto.getContent())
@@ -113,6 +123,7 @@ public class CommentService {
 
         Optional<Comment> commentOptional = member.findComment(commentId);
         if (commentOptional.isEmpty()) {
+            log.error("nickname={}, error={}", member.getNickname(), "해당 댓글을 찾을 수 없습니다.");
             return new ResponseEntity<>(
                     CommentUpdateResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -120,6 +131,15 @@ public class CommentService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
+
+        if (commentUpdateRequestDto.getContent().length() > 255) {
+            log.error("nickname={}, error={}", member.getNickname(), "댓글 수정 글자 255자 초과");
+            return new ResponseEntity<>(
+                    CommentUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
+
         Comment comment = commentOptional.get();
 
         //setter를 쓰니까 .setContent로 바로해주면 됨.
@@ -142,6 +162,7 @@ public class CommentService {
         boolean isValid = member.deleteComment(id);
 
         if(!isValid) {
+            log.error("nickname={}, error={}", member.getNickname(), "댓글을 찾을 수 없습니다.");
             return new ResponseEntity<>(
                     CommentDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -163,6 +184,7 @@ public class CommentService {
     // 관리자, 댓글 삭제
     public ResponseEntity<CommentDeleteResponseDto> adminDeleteComment(Long commentId, MemberDetails memberDetails) {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
+            log.error("nickname={}, error={}", memberDetails.getNickname(), "관리자 권한이 없음");
             return new ResponseEntity<>(
                     CommentDeleteResponseDto.builder()
                             .status(StatusMessage.FORBIDDEN_USER)

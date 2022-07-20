@@ -3,6 +3,7 @@ package com.igocst.coco.dto.post;
 import com.igocst.coco.domain.MeetingType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 @Getter @Setter
 public class PostSaveRequestDto {
