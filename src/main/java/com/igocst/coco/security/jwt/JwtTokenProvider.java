@@ -21,9 +21,8 @@ public class JwtTokenProvider {
     @Value("${secret.jwt.key}")
     private String secretKey;
 
-    // 만료 시간 어떻게?, 1시간? 6시간? 하루?
     @Value("${secret.jwt.expiration}")
-    private Long expiration;   // 3시간
+    private Long expiration;
     private final MemberDetailsService memberDetailsService;
 
     // JWT 토큰 생성

@@ -256,7 +256,8 @@ public class MemberService {
                                                                         MemberDetails memberDetails) {
 
         // 찾은 멤버의 아이디로 멤버를 찾았으면, 멤버의 기존 닉네임을 얻어올 수 있다.
-        Member member = memberDetails.getMember();
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         //닉네임이 기존 닉네임과 같지 않을 때 동작
         String nickname = checkNicknameDupRequestDto.getNickname();
