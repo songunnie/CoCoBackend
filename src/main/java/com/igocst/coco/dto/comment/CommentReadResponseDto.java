@@ -2,7 +2,6 @@ package com.igocst.coco.dto.comment;
 
 import com.igocst.coco.domain.MemberRole;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Builder

@@ -14,3 +14,5 @@
 
 # IntelliJ IDEA
 application-aws.properties
+application-secret.properties
+application-rds.properties

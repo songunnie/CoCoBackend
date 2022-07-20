@@ -8,7 +8,6 @@ import com.igocst.coco.dto.message.*;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.MessageRepository;
 import com.igocst.coco.security.MemberDetails;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,19 +27,26 @@ public class MessageService {
 
     // 쪽지 보내기
     @Transactional
-    public ResponseEntity<MessageCreateResponseDto> join(MessageCreateRequestDto messageCreateRequestDto, MemberDetails memberDetails) {
+    public ResponseEntity<MessageCreateResponseDto> createMessage(MessageCreateRequestDto messageCreateRequestDto, MemberDetails memberDetails) {
 
-        Member sendMember = memberRepository.findByEmail(memberDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("보내는 사람이 존재하지 않습니다."));
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member sendMember = memberOptional.get();
 
+        Optional<Member> receivedMemberOptional = memberRepository.findByNickname(messageCreateRequestDto.getReceiver());
+        if(receivedMemberOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    MessageCreateResponseDto.builder()
+                            .status(StatusMessage.SUCCESS)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.SUCCESS)
+            );
+        };
 
-        String receiver = messageCreateRequestDto.getReceiver();
-        Member received = memberRepository.findByNickname(receiver)
-                .orElseThrow(() -> new IllegalArgumentException("받는 사람이 존재하지 않습니다."));
+        Member receivedMember = receivedMemberOptional.get();
 
         // message 보내는 코드
         Message message = Message.builder()
-                .receiver(received)
+                .receiver(receivedMember)
                 .title(messageCreateRequestDto.getTitle())
                 .content(messageCreateRequestDto.getContent())
                 .createDate(messageCreateRequestDto.getCreateDate())
@@ -62,12 +69,11 @@ public class MessageService {
     @Transactional
     public ResponseEntity<MessageReadResponseDto> getMessage(Long messageId, MemberDetails memberDetails) {
 
-        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
-        Message message = member.findMessage(messageId);
-        if (message == null) {
-//            throw new RuntimeException("쪽지에 대한 권한이 없습니다.");
+        Optional<Message> messageOptional = member.findMessage(messageId);
+        if (messageOptional.isEmpty()) {
             return new ResponseEntity<>(
                     MessageReadResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -75,6 +81,8 @@ public class MessageService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
+
+        Message message = messageOptional.get();
 
         message.setReadState(true);
 
@@ -96,12 +104,10 @@ public class MessageService {
     @Transactional
     public ResponseEntity<List<MessageListReadResponseDto>> getMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
 
-        String readMember = memberDetails.getUsername();
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member readMember = memberOptional.get();
 
-        Member member = memberRepository.findByEmail(readMember)
-                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
-
-        List<Message> messages = member.getReadMessage();
+        List<Message> messages = readMember.getReadMessage();
 
         List<MessageListReadResponseDto> messageList = new ArrayList<>();
         for (Message m : messages) {
@@ -122,13 +128,12 @@ public class MessageService {
     @Transactional
     public ResponseEntity<MessageDeleteResponseDto> deleteMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
 
-        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("쪽지에 대한 권한이 없습니다."));
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         boolean isValid = member.deleteMessage(messageId);
 
         if (!isValid) {
-//            throw new RuntimeException("쪽지를 삭제할 수 있는 권한이 없습니다.");
             return new ResponseEntity<>(
                     MessageDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)

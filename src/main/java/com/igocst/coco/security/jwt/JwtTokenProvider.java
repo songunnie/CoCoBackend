@@ -4,45 +4,45 @@ import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.MemberDetailsService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
-    private static final String SECRET_KEY = "COCOPROJECTLETSGO";
-    // 만료 시간 어떻게?, 1시간? 6시간? 하루?
-    private static final int EXPIRATION_MS = 3600000 * 3;   // 3시간
+    @Value("${secret.jwt.key}")
+    private String secretKey;
+
+    @Value("${secret.jwt.expiration}")
+    private Long expiration;
     private final MemberDetailsService memberDetailsService;
 
-
     // JWT 토큰 생성
-    public static String generateToken(String email) {
+    public String generateToken(String email) {
         Claims claims = Jwts.claims().setSubject(email);
         Date currentDate = new Date();
-        Date expirationDate = new Date(currentDate.getTime() + EXPIRATION_MS);
+        Date expirationDate = new Date(currentDate.getTime() + expiration);
         return Jwts.builder()
                 .setSubject(email)
                 .setClaims(claims)
                 .setIssuedAt(currentDate)
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     // JWT 토큰에서 회원 정보 가져오기
-    public static String getMemberEmailFromToken(String token) {
+    public String getMemberEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
@@ -52,23 +52,21 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         // UserDetailsService에서 DB에 JWT 토큰으로 넣어둔 email과 일치하는 데이터가 있으면 가져온다. ( MemberDetails )
         MemberDetails memberDetails = memberDetailsService.loadUserByUsername(getMemberEmailFromToken(token));
+        if (memberDetails.getMember() == null) {
+            return null;
+        }
+
         return new UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.getAuthorities());
     }
 
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
 
-//     http 요청 헤더에서 JWT 토큰 값 가져오기
-//    public String resolveToken(HttpServletRequest request) {
-//        return request.getHeader("X-AUTH-TOKEN");
-//    }
-
 //     JWT 토큰이 Authorization Bearer 헤더에 있다
     public String resolveToken(HttpServletRequest request) {
         String headerValue = request.getHeader(HEADER_AUTHORIZATION);
         if (headerValue == null) {
             return null;
-//            throw new RuntimeException("토큰 정보가 없습니다.");
         }
 
         if (!headerValue.startsWith(TOKEN_PREFIX)) {
@@ -79,36 +77,22 @@ public class JwtTokenProvider {
         return headerValue.substring(TOKEN_PREFIX.length());
     }
 
-    // JWT 토큰이 쿠키에 담겨져 있다
-//    public String resolveToken(HttpServletRequest request) {
-//        Cookie[] cookies = request.getCookies();
-//        if (cookies.length < 1) {
-//            throw new RuntimeException("JWT 토큰이 존재하지 않습니다.");
-//        }
-//        String token = null;
-//        for (Cookie cookie : cookies) {
-//            if (cookie.getName().equals("token")) {
-//                token = cookie.getValue();
-//            }
-//        }
-//        return token;
-//    }
-
     // JWT 토큰 예외 검사
-    public static boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException e){
-            System.out.println("잘못된 JWT 서명입니다.");
+            // 로그 찍어주기, 로그를 콘솔로? 파일로? 찍어줄 수 있다.
+            log.error("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            System.out.println("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            System.out.println("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            System.out.println("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.");
         } catch (Exception e) {
-            System.out.println("JWT 예외 발생");
+            log.error("JWT 예외 발생");
         }
         return false;
     }

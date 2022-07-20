@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,10 +16,10 @@ import java.util.List;
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
-    @PostMapping("/bookmark/{postId}")
+    @PostMapping("/{postId}/bookmark")
     public ResponseEntity<BookmarkSaveResponseDto> saveBookmark(@PathVariable Long postId,
                                                                @AuthenticationPrincipal MemberDetails memberDetails) {
-        return bookmarkService.join(postId, memberDetails);
+        return bookmarkService.saveBookmark(postId, memberDetails);
     }
 
     @GetMapping("/bookmark/list")

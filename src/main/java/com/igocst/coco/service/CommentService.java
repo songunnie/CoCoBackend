@@ -15,10 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,17 +28,24 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     // 댓글 생성
-    //DB동기화를 위해
+    // DB동기화를 위해 Transactional 어노테이션 사용
     @Transactional
-    //comment를 받으면 CommentRepository에 저장
-    public ResponseEntity<CommentCreateResponseDto> join(CommentCreateRequestDto commentCreateRequestDto, Long post_id, MemberDetails memberDetails) { //join = comment create
+    public ResponseEntity<CommentCreateResponseDto> createComment(CommentCreateRequestDto commentCreateRequestDto, Long postId, MemberDetails memberDetails) { //join = comment create
         //회원을 찾아 가져오고.
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다"));
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         //주인인 Post를 찾고,
-        Post post = postRepository.findById(post_id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //주인(Post)을 찾아온것.
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    CommentCreateResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
+            );
+        }
+        Post post = postOptional.get();
 
         //Comment를 하나 만들고
         Comment comment = Comment.builder()
@@ -59,13 +66,12 @@ public class CommentService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     // 댓글 조회
-    public ResponseEntity<List<CommentReadResponseDto>> readCommentList(Long post_id, MemberDetails memberDetails) {
+    public ResponseEntity<List<CommentReadResponseDto>> readCommentList(Long postId, MemberDetails memberDetails) {
         //List로 받고
-        List<Comment> comments = commentRepository.findAllByPostId(post_id);
+        List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentReadResponseDto> output = new ArrayList<>();
         boolean enableDelete;
 
@@ -88,7 +94,6 @@ public class CommentService {
                     .id(c.getId())
                     .comments(c.getContent())
                     .nickname(c.getMember().getNickname())
-                    //c.getPost().getComments는 결국 댓글의 게시글을 불러와서 다시 그 댓글을 다 찍어준 것= 값이 두번씩 찍히는 에러
                     .profileImageUrl(c.getMember().getProfileImageUrl())
                     .createDate(c.getCreateDate())
                     .status(StatusMessage.SUCCESS)
@@ -102,13 +107,12 @@ public class CommentService {
     //댓글 수정
     @Transactional
     public ResponseEntity<CommentUpdateResponseDto> updateComment(CommentUpdateRequestDto commentUpdateRequestDto,
-                                                  Long comment_id, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+                                                  Long commentId, MemberDetails memberDetails) {
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
-        Comment comment = member.findComment(comment_id);
-        if (comment == null) {
-//            throw new RuntimeException("작성한 댓글을 찾을 수 없습니다.");
+        Optional<Comment> commentOptional = member.findComment(commentId);
+        if (commentOptional.isEmpty()) {
             return new ResponseEntity<>(
                     CommentUpdateResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -116,6 +120,7 @@ public class CommentService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
+        Comment comment = commentOptional.get();
 
         //setter를 쓰니까 .setContent로 바로해주면 됨.
         comment.setContent(commentUpdateRequestDto.getContent());
@@ -126,20 +131,17 @@ public class CommentService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     //댓글 삭제
     @Transactional
     public ResponseEntity<CommentDeleteResponseDto> deleteComment(Long id, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
-
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         boolean isValid = member.deleteComment(id);
 
         if(!isValid) {
-//            throw new RuntimeException("삭제할 수 없습니다.");
             return new ResponseEntity<>(
                     CommentDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)
@@ -156,7 +158,6 @@ public class CommentService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     // 관리자, 댓글 삭제
@@ -164,9 +165,9 @@ public class CommentService {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
             return new ResponseEntity<>(
                     CommentDeleteResponseDto.builder()
-                            .status(StatusMessage.UNAUTHORIZED_USER)
+                            .status(StatusMessage.FORBIDDEN_USER)
                             .build(),
-                    HttpStatus.valueOf(StatusCode.UNAUTHORIZED_USER)
+                    HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
             );
         }
         commentRepository.deleteById(commentId);
@@ -177,6 +178,5 @@ public class CommentService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 }

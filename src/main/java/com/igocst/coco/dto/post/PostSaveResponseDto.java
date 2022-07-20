@@ -7,5 +7,5 @@ import lombok.Setter;
 @Getter @Setter
 @Builder
 public class PostSaveResponseDto {
-    String status;
+    private String status;
 }

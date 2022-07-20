@@ -5,7 +5,6 @@ import com.igocst.coco.domain.MemberRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 

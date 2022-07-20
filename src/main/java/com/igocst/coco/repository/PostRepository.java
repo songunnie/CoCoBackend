@@ -4,17 +4,15 @@ import com.igocst.coco.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
-import javax.transaction.Transactional;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // 모집 중인 게시글만 가져온다.
     List<Post> findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
     List<Post> findAllByOrderByLastModifiedDateDesc();
-    List<Post> findAllByMember_Id(Long id);
+    List<Post> findAllByMember_IdOrderByLastModifiedDateDesc(Long id);
 
-    @Transactional
+
     @Modifying
     @Query("update Post p set p.hits = p.hits + 1 where p.id = :id")
     int updateHits(Long id);

@@ -21,14 +21,6 @@ public class MemberDetails implements UserDetails {
         return member;
     }
 
-
-    /**
-     * 스프링 시큐리티가 권한을 이해하기 위해선 'ROLE_'가 앞에 있어야 한다
-     * 일반 사용자 = ROLE_MEMBER
-     * 관리자 = ROLE_ADMIN
-     */
-//    private static final String ROLE_PREFIX = "ROLE_";
-
     // 인가 부분
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

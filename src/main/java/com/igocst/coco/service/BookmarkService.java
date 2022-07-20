@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -27,14 +28,22 @@ public class BookmarkService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
+    // 북마크에 저장하기
     @Transactional
-    public ResponseEntity<BookmarkSaveResponseDto> join(Long postId, MemberDetails memberDetails) {
+    public ResponseEntity<BookmarkSaveResponseDto> saveBookmark(Long postId, MemberDetails memberDetails) {
+        // 영속성이 없는상태
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
-        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
-                .orElseThrow( () -> new IllegalArgumentException("권한이 없습니다."));
-
-        Post post  = postRepository.findById(postId)
-                .orElseThrow( () -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+        Optional<Post> postOptional  = postRepository.findById(postId);
+        if(postOptional.isEmpty()) {
+            return new ResponseEntity<>(
+                    BookmarkSaveResponseDto.builder()
+                            .status(StatusMessage.BAD_REQUEST)
+                            .build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST));
+        }
+        Post post = postOptional.get();
 
         List<Bookmark> bookmarks = bookmarkRepository.findAllByPostId(postId);
 
@@ -42,7 +51,6 @@ public class BookmarkService {
 
             // 이미 본인이 저장한 북마크는 또 저장할 수 없음
             if (b.getMember().getId() == memberDetails.getMember().getId()) {
-//                throw new IllegalArgumentException("북마크에 저장되어있는 게시물입니다.");
                 return new ResponseEntity<>(
                         BookmarkSaveResponseDto.builder()
                                 .status(StatusMessage.BAD_REQUEST)
@@ -68,11 +76,12 @@ public class BookmarkService {
 
     }
 
+    // 북마크 리스트 불러오기
     @Transactional
     public ResponseEntity<List<BookmarkListReadResponseDto>> readBookmarkList(MemberDetails memberDetails) {
 
-        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail())
-                .orElseThrow( () -> new IllegalArgumentException("권한이 없습니다."));
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         List<Bookmark> bookmarks = member.getBookmarks();
 
@@ -88,23 +97,21 @@ public class BookmarkService {
                     .hits(b.getPost().getHits())
                     .status(StatusMessage.SUCCESS)
                     .build());
-
         }
         return new ResponseEntity<>(bookmarkList, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
 
+    // 북마크 삭제
     @Transactional
     public ResponseEntity<BookmarkDeleteResponseDto> deleteBookmark(Long bookmarkId, MemberDetails memberDetails) {
 
-        Member member = memberRepository.findById(memberDetails.getMember().getId())
-                .orElseThrow( () -> new IllegalArgumentException("유효한 회원이 아닙니다.")
-        );
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+        Member member = memberOptional.get();
 
         boolean isValid = member.deleteBookmark(bookmarkId);
 
         if(!isValid) {
-//            throw new RuntimeException("삭제할 수 없습니다.");
             return new ResponseEntity<>(
                     BookmarkDeleteResponseDto.builder()
                             .status(StatusMessage.BAD_REQUEST)

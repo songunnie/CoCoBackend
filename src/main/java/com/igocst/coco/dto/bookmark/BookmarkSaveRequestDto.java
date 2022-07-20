@@ -1,6 +1,5 @@
 package com.igocst.coco.dto.bookmark;
 
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
