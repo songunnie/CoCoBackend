@@ -15,7 +15,7 @@
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>60</maxHistory>
+            <maxHistory>80</maxHistory>
         </rollingPolicy>
 
         <encoder>
