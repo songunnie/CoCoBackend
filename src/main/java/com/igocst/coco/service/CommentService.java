@@ -42,9 +42,7 @@ public class CommentService {
         if (postOptional.isEmpty()) {
             log.error("nickname={}, error={}", member.getNickname(), "해당 게시글을 찾을 수 없음");
             return new ResponseEntity<>(
-                    CommentCreateResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    CommentCreateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -58,22 +56,18 @@ public class CommentService {
             );
         }
         //Comment를 하나 만들고
-        Comment comment = Comment.builder()
-                .content(commentCreateRequestDto.getContent())
-                .build();
+        Comment comment = Comment.builder().content(commentCreateRequestDto.getContent()).build();
         /*주인에게 연관관계 메소드를 통해 "이 댓글 내거야!" 하고 말해줌
         comment는 repo에서 꺼내온게 아니기 때문에 영속성이 없는상태
         post가 영속성이기 때문에 comment도 연관관계 매핑을 통해 영속성으로 들어감*/
-        member.addComment(comment);
-        post.addComment(comment);
+        member.createComment(comment);
+        post.createComment(comment);
 
         //댓글을 repo에 저장해줌. 이거 필요없.
         commentRepository.save(comment);
 
         return new ResponseEntity<>(
-                CommentCreateResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                CommentCreateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
@@ -125,9 +119,7 @@ public class CommentService {
         if (commentOptional.isEmpty()) {
             log.error("nickname={}, error={}", member.getNickname(), "해당 댓글을 찾을 수 없습니다.");
             return new ResponseEntity<>(
-                    CommentUpdateResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    CommentUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -139,16 +131,11 @@ public class CommentService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         Comment comment = commentOptional.get();
-
-        //setter를 쓰니까 .setContent로 바로해주면 됨.
-        comment.setContent(commentUpdateRequestDto.getContent());
+        comment.updateContent(commentUpdateRequestDto.getContent());
 
         return new ResponseEntity<>(
-                CommentUpdateResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                CommentUpdateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
@@ -160,23 +147,17 @@ public class CommentService {
         Member member = memberOptional.get();
 
         boolean isValid = member.deleteComment(id);
-
         if(!isValid) {
             log.error("nickname={}, error={}", member.getNickname(), "댓글을 찾을 수 없습니다.");
             return new ResponseEntity<>(
-                    CommentDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    CommentDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         commentRepository.deleteById(id);
 
         return new ResponseEntity<>(
-                CommentDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                CommentDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
@@ -186,18 +167,14 @@ public class CommentService {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "관리자 권한이 없음");
             return new ResponseEntity<>(
-                    CommentDeleteResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
-                            .build(),
+                    CommentDeleteResponseDto.builder().status(StatusMessage.FORBIDDEN_USER).build(),
                     HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
             );
         }
         commentRepository.deleteById(commentId);
 
         return new ResponseEntity<>(
-                CommentDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                CommentDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }

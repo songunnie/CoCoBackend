@@ -2,11 +2,14 @@ package com.igocst.coco.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.igocst.coco.domain.timestamped.Timestamped;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +32,11 @@ public class Comment extends Timestamped {
 
     @Column(nullable = false)
     private String content;
+
+    public void registerMember(Member member) {
+        this.member = member;
+    }
+
+    public void registerPost(Post post) { this.post = post; }
+    public void updateContent(String content) { this.content = content; }
 }

@@ -1,7 +1,11 @@
 package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,7 +14,6 @@ import java.util.Optional;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -69,7 +72,7 @@ public class Member extends Timestamped {
      */
     // 회원이 작성한 게시글 추가
     public void addPost(Post post) {
-        post.setMember(this);
+        post.registerMember(this);
         posts.add(post);
     }
 
@@ -103,8 +106,8 @@ public class Member extends Timestamped {
 
     // 연관관계 메소드 / 댓글 - 회원
     // member와 comment의 연관관계 메소드
-    public void addComment(Comment comment) {
-        comment.setMember(this);
+    public void createComment(Comment comment) {
+        comment.registerMember(this);
         comments.add(comment);
     }
 
@@ -124,7 +127,7 @@ public class Member extends Timestamped {
     public void sendMessage(Message message) {
         this.sendMessage.add(message);
         if (message.getSender() != this) {
-            message.setSender(this);
+            message.sendMember(this);
         }
     }
 
@@ -191,10 +194,9 @@ public class Member extends Timestamped {
         this.profileImageUrl = profileImageUrl;
     }
 
-
     // 북마크
     public void addBookmark(Bookmark bookmark) {
-        bookmark.setMember(this);
+        bookmark.registerMember(this);
         bookmarks.add(bookmark);
     }
 

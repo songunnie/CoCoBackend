@@ -1,12 +1,15 @@
 package com.igocst.coco.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,4 +39,6 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime createDate;
 
+    public void sendMember(Member member) { this.sender = member;}
+    public void changeReadState() { this.readState = true; }
 }

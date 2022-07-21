@@ -5,7 +5,6 @@ import com.igocst.coco.domain.MemberRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -16,7 +15,6 @@ public class MemberDetails implements UserDetails {
     public MemberDetails(Member member) {
         this.member = member;
     }
-
     public Member getMember() {
         return member;
     }

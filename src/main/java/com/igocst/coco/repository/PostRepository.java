@@ -12,7 +12,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByOrderByLastModifiedDateDesc();
     List<Post> findAllByMember_IdOrderByLastModifiedDateDesc(Long id);
 
-
     @Modifying
     @Query("update Post p set p.hits = p.hits + 1 where p.id = :id")
     int updateHits(Long id);

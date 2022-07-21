@@ -1,4 +1,3 @@
-
 package com.igocst.coco.service;
 
 import com.igocst.coco.common.status.StatusCode;
@@ -16,11 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -60,9 +57,7 @@ public class PostService {
         postRepository.save(post);
 
         return new ResponseEntity<>(
-                PostSaveResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                PostSaveResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
@@ -77,9 +72,7 @@ public class PostService {
         if (postOptional.isEmpty()) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "해당 게시글 존재하지 않음");
             return new ResponseEntity<>(
-                    PostReadResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    PostReadResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -100,7 +93,6 @@ public class PostService {
             memberRole = MemberRole.ADMIN;
             enableDelete = true;
         }
-
         postRepository.updateHits(postId);
 
         return new ResponseEntity<>(
@@ -192,9 +184,7 @@ public class PostService {
         if (postOptional.isEmpty()) {
             log.error("nickname={}, error={}", member.getNickname(), "수정할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
-                    PostUpdateResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    PostUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -211,12 +201,9 @@ public class PostService {
         findPost.updatePost(requestDto);
 
         return new ResponseEntity<>(
-                PostUpdateResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                PostUpdateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     //     게시글 삭제
@@ -232,23 +219,17 @@ public class PostService {
         if(!isValid) {
             log.error("nickname={}, error={}", member.getNickname(), "삭제할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
-                    PostDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    PostDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         // 위의 예외처리를 통과하면 일치하는 사용자이므로, 해당 게시글을 삭제한다.
         postRepository.deleteById(postId);
 
         return new ResponseEntity<>(
-                PostDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                PostDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     // 관리자, 게시글 삭제 기능
@@ -257,46 +238,34 @@ public class PostService {
         if (!memberDetails.getMember().getRole().equals(MemberRole.ADMIN)) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "관리자 권한이 없음");
             return new ResponseEntity<>(
-                    PostDeleteResponseDto.builder()
-                            .status(StatusMessage.FORBIDDEN_USER)
-                            .build(),
+                    PostDeleteResponseDto.builder().status(StatusMessage.FORBIDDEN_USER).build(),
                     HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
             );
         }
-        /**
-         * 관리자가 임의로 게시글을 삭제한다.
-         * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
-         */
+
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "해당 게시글이 존재하지 않음");
             return new ResponseEntity<>(
-                    PostDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    PostDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
         Post findPost = postOptional.get();
-//
         Member member = findPost.getMember();
-        boolean isValid = member.deletePost(postId);
 
+        boolean isValid = member.deletePost(postId);
         if(!isValid) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "삭제할 게시글이 존재하지 않음");
             return new ResponseEntity<>(
-                    PostDeleteResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    PostDeleteResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
         postRepository.deleteById(postId);
 
         return new ResponseEntity<>(
-                PostDeleteResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                PostDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }

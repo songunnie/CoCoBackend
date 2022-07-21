@@ -7,11 +7,11 @@ import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -33,7 +33,6 @@ public class MemberController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto requestDto) {
         return memberService.register(requestDto);
-//        return new ResponseEntity<>(StatusMessage.SUCCESS, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
     //회원 정보 획득
@@ -46,10 +45,8 @@ public class MemberController {
     @PutMapping("/user")
     public ResponseEntity<MemberUpdateResponseDto> updateMember(@ModelAttribute MemberUpdateRequestDto memberUpdateRequestDto,
                                                                 @AuthenticationPrincipal MemberDetails memberDetails) throws IOException {
-
         return memberService.updateMember(memberUpdateRequestDto, memberDetails);
     }
-
 
     // 회원 탈퇴
     @DeleteMapping("/user")
