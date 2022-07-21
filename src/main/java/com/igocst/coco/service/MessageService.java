@@ -5,7 +5,6 @@ import com.igocst.coco.common.status.StatusMessage;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.Message;
 import com.igocst.coco.dto.message.*;
-import com.igocst.coco.dto.post.PostSaveResponseDto;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.MessageRepository;
 import com.igocst.coco.security.MemberDetails;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +37,7 @@ public class MessageService {
         if(receivedMemberOptional.isEmpty()) {
             log.error("nickname={}, error={}", messageCreateRequestDto.getReceiver(), "쪽지 수신자를 찾을 수 없음");
             return new ResponseEntity<>(
-                    MessageCreateResponseDto.builder()
-                            .status(StatusMessage.SUCCESS)
-                            .build(),
+                    MessageCreateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                     HttpStatus.valueOf(StatusCode.SUCCESS)
             );
         };
@@ -69,14 +65,10 @@ public class MessageService {
         messageRepository.save(message);
 
         return new ResponseEntity<>(
-                MessageCreateResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .build(),
+                MessageCreateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
-
 
     // 쪽지 상세 읽기
     @Transactional
@@ -89,9 +81,7 @@ public class MessageService {
         if (messageOptional.isEmpty()) {
             log.error("nickname={}, messageId={}, error={}", member.getNickname(), messageId, "해당 쪽지를 찾을 수 없음");
             return new ResponseEntity<>(
-                    MessageReadResponseDto.builder()
-                            .status(StatusMessage.BAD_REQUEST)
-                            .build(),
+                    MessageReadResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
@@ -99,7 +89,6 @@ public class MessageService {
         Message message = messageOptional.get();
         // false -> true
         message.changeReadState();
-
 
         return new ResponseEntity<>(
                 MessageReadResponseDto.builder()
@@ -111,9 +100,7 @@ public class MessageService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
-
 
     // 쪽지 리스트 읽기
     @Transactional
@@ -138,7 +125,6 @@ public class MessageService {
         return new ResponseEntity<>(messageList, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
-
     // 쪽지 삭제
     @Transactional
     public ResponseEntity<MessageDeleteResponseDto> deleteMessage(Long messageId, @AuthenticationPrincipal MemberDetails memberDetails) {
@@ -155,13 +141,11 @@ public class MessageService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         messageRepository.deleteById(messageId);
 
         return new ResponseEntity<>(
                 MessageDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 }

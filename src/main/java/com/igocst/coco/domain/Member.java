@@ -1,7 +1,11 @@
 package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Iterator;

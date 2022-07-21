@@ -6,7 +6,6 @@ import com.igocst.coco.domain.Comment;
 import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
-import com.igocst.coco.dto.comment.CommentCreateResponseDto;
 import com.igocst.coco.dto.comment.CommentReadResponseDto;
 import com.igocst.coco.dto.member.*;
 import com.igocst.coco.dto.post.PostReadResponseDto;
@@ -82,7 +81,6 @@ public class MemberService {
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
-
 
     // 회원가입
     public ResponseEntity<RegisterResponseDto> register(RegisterRequestDto requestDto) {

@@ -1,4 +1,3 @@
-
 package com.igocst.coco.service;
 
 import com.igocst.coco.common.status.StatusCode;
@@ -16,11 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +93,6 @@ public class PostService {
             memberRole = MemberRole.ADMIN;
             enableDelete = true;
         }
-
         postRepository.updateHits(postId);
 
         return new ResponseEntity<>(
@@ -227,7 +223,6 @@ public class PostService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         // 위의 예외처리를 통과하면 일치하는 사용자이므로, 해당 게시글을 삭제한다.
         postRepository.deleteById(postId);
 
@@ -257,10 +252,9 @@ public class PostService {
             );
         }
         Post findPost = postOptional.get();
-//
         Member member = findPost.getMember();
-        boolean isValid = member.deletePost(postId);
 
+        boolean isValid = member.deletePost(postId);
         if(!isValid) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "삭제할 게시글이 존재하지 않음");
             return new ResponseEntity<>(

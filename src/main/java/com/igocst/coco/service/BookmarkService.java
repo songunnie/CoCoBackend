@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,6 @@ public class BookmarkService {
         Post post = postOptional.get();
 
         List<Bookmark> bookmarks = bookmarkRepository.findAllByPostId(postId);
-
         for(Bookmark b : bookmarks) {
 
             // 이미 본인이 저장한 북마크는 또 저장할 수 없음
@@ -61,17 +59,14 @@ public class BookmarkService {
         }
 
         Bookmark bookmark = new Bookmark();
-
         member.addBookmark(bookmark);
         post.addBookmark(bookmark);
-
         bookmarkRepository.save(bookmark);
 
         return new ResponseEntity<>(
                 BookmarkSaveResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     // 북마크 리스트 불러오기
@@ -82,7 +77,6 @@ public class BookmarkService {
         Member member = memberOptional.get();
 
         List<Bookmark> bookmarks = member.getBookmarks();
-
         List<BookmarkListReadResponseDto> bookmarkList = new ArrayList<>();
         for (Bookmark b : bookmarks) {
             bookmarkList.add(BookmarkListReadResponseDto.builder()
@@ -108,7 +102,6 @@ public class BookmarkService {
         Member member = memberOptional.get();
 
         boolean isValid = member.deleteBookmark(bookmarkId);
-
         if(!isValid) {
             log.error("nickname={}, messageId={}, error={}", member.getNickname(), bookmarkId, "해당 북마크를 찾을 수 없음");
             return new ResponseEntity<>(
@@ -116,14 +109,11 @@ public class BookmarkService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         bookmarkRepository.deleteById(bookmarkId);
 
         return new ResponseEntity<>(
                 BookmarkDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
-
 }

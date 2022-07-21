@@ -55,7 +55,6 @@ public class JwtTokenProvider {
         if (memberDetails.getMember() == null) {
             return null;
         }
-
         return new UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.getAuthorities());
     }
 
@@ -68,11 +67,9 @@ public class JwtTokenProvider {
         if (headerValue == null) {
             return null;
         }
-
         if (!headerValue.startsWith(TOKEN_PREFIX)) {
             throw new IllegalArgumentException("잘못된 토큰 정보입니다.");
         }
-
         // 'Authorization Bearer '에 담겨있는 토큰을 가져온다
         return headerValue.substring(TOKEN_PREFIX.length());
     }

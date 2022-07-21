@@ -2,7 +2,11 @@ package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
 import com.igocst.coco.dto.post.PostUpdateRequestDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +24,6 @@ public class Post extends Timestamped {
     private Long id;
 
     // JSON으로 타입으로 변환하기 위해 fetch타입 LAZY를 해제
-    // cascade = CascadeType.PERSIST 게시글 생성중 잠시 주석처리
     @ManyToOne()
     @JoinColumn(name = "MEMBER_ID") // 외래키와 매핑
     private Member member;
@@ -55,10 +58,9 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
-    /**
+    /*
      * 비즈니스 로직
-     * 게시글 수정
-     */
+     * 게시글 수정 */
     public void updatePost(PostUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
@@ -81,7 +83,5 @@ public class Post extends Timestamped {
     }
 
     // 게시글 작성한 회원
-    public void registerMember(Member member) {
-        this.member = member;
-    }
+    public void registerMember(Member member) { this.member = member; }
 }

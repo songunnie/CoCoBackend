@@ -1,6 +1,10 @@
 package com.igocst.coco.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,7 +31,6 @@ public class Bookmark {
     public void registerMember(Member member) {
         this.member = member;
     }
-
     public void registerPost(Post post) {
         this.post = post;
     }

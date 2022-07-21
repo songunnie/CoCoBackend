@@ -131,9 +131,7 @@ public class CommentService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         Comment comment = commentOptional.get();
-
         comment.updateContent(commentUpdateRequestDto.getContent());
 
         return new ResponseEntity<>(
@@ -149,7 +147,6 @@ public class CommentService {
         Member member = memberOptional.get();
 
         boolean isValid = member.deleteComment(id);
-
         if(!isValid) {
             log.error("nickname={}, error={}", member.getNickname(), "댓글을 찾을 수 없습니다.");
             return new ResponseEntity<>(
@@ -157,7 +154,6 @@ public class CommentService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         commentRepository.deleteById(id);
 
         return new ResponseEntity<>(
