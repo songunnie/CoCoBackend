@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,4 +35,7 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime createDate;
 
+    public void sendMember(Member member) { this.sender = member;}
+
+    public void changeReadState() { this.readState = true; }
 }

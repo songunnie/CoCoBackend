@@ -97,8 +97,9 @@ public class MessageService {
         }
 
         Message message = messageOptional.get();
+        // false -> true
+        message.changeReadState();
 
-        message.setReadState(true);
 
         return new ResponseEntity<>(
                 MessageReadResponseDto.builder()

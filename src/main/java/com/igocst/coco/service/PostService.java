@@ -208,7 +208,6 @@ public class PostService {
                 PostUpdateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     //     게시글 삭제
@@ -236,7 +235,6 @@ public class PostService {
                 PostDeleteResponseDto.builder().status(StatusMessage.SUCCESS).build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
-
     }
 
     // 관리자, 게시글 삭제 기능
@@ -249,10 +247,7 @@ public class PostService {
                     HttpStatus.valueOf(StatusCode.FORBIDDEN_USER)
             );
         }
-        /**
-         * 관리자가 임의로 게시글을 삭제한다.
-         * 삭제할 게시글 id를 이용해 게시글을 가져오고, 그 게시글을 작성한 회원과 연관관계를 끊고 삭제시킨다.
-         */
+
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
             log.error("nickname={}, error={}", memberDetails.getNickname(), "해당 게시글이 존재하지 않음");

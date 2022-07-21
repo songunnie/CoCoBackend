@@ -6,7 +6,6 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +28,16 @@ public class Comment extends Timestamped {
 
     @Column(nullable = false)
     private String content;
+
+    public void registerMember(Member member) {
+        this.member = member;
+    }
+
+    public void registerPost(Post post) {
+        this.post = post;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

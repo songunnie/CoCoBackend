@@ -9,13 +9,13 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${LOGS_PATH}log-%d{yyyy-MM-dd_HH_mm}.%i.txt</fileNamePattern>
+            <fileNamePattern>${LOGS_PATH}log-%d{yyyy-MM-dd_HH}.%i.txt</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>10</maxHistory>
+            <maxHistory>60</maxHistory>
         </rollingPolicy>
 
         <encoder>

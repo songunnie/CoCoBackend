@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookmarkSaveRequestDto {
-    private String title;
     private String status;
 }

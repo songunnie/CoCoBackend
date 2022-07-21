@@ -60,8 +60,8 @@ public class CommentService {
         /*주인에게 연관관계 메소드를 통해 "이 댓글 내거야!" 하고 말해줌
         comment는 repo에서 꺼내온게 아니기 때문에 영속성이 없는상태
         post가 영속성이기 때문에 comment도 연관관계 매핑을 통해 영속성으로 들어감*/
-        member.addComment(comment);
-        post.addComment(comment);
+        member.createComment(comment);
+        post.createComment(comment);
 
         //댓글을 repo에 저장해줌. 이거 필요없.
         commentRepository.save(comment);
@@ -134,8 +134,7 @@ public class CommentService {
 
         Comment comment = commentOptional.get();
 
-        //setter를 쓰니까 .setContent로 바로해주면 됨.
-        comment.setContent(commentUpdateRequestDto.getContent());
+        comment.updateContent(commentUpdateRequestDto.getContent());
 
         return new ResponseEntity<>(
                 CommentUpdateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
