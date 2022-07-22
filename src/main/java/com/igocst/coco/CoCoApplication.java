@@ -15,6 +15,6 @@ public class CoCoApplication {
         SpringApplication.run(CoCoApplication.class, args);
     }
 
-    @PostConstruct
-    void postConstruct() { TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul")); }
+//    @PostConstruct
+//    void postConstruct() { TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul")); }
 }
