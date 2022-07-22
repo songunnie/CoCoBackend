@@ -98,7 +98,7 @@ public class Member extends Timestamped {
         }
         for (Post post : posts) {
             if (post.getId() == postId) {
-                return Optional.of(post);
+                return Optional.ofNullable(post);
             }
         }
         return Optional.empty();
@@ -118,7 +118,7 @@ public class Member extends Timestamped {
         }
         for (Comment comment : comments) {
             if (comment.getId() == commentId) {
-                return Optional.of(comment);
+                return Optional.ofNullable(comment);
             }
         }
         return Optional.empty();
@@ -138,7 +138,7 @@ public class Member extends Timestamped {
         }
         for (Message message : readMessage) {
             if (message.getId() == messageId) {
-                return Optional.of(message);
+                return Optional.ofNullable(message);
             }
         }
         return Optional.empty();
