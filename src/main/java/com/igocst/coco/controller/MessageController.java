@@ -33,6 +33,11 @@ public class MessageController {
         return messageService.getMessageList(memberDetails);
     }
 
+    @GetMapping("/message/list/send")
+    public ResponseEntity<List<MessageListReadResponseDto>> readSendMessages(@AuthenticationPrincipal MemberDetails memberDetails) {
+        return messageService.getSendMessageList(memberDetails);
+    }
+
     @DeleteMapping("/message/{messageId}")
     public ResponseEntity<MessageDeleteResponseDto> find(@PathVariable Long messageId,
                                          @AuthenticationPrincipal MemberDetails memberDetails) {
