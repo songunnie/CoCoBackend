@@ -39,7 +39,7 @@ public class S3Service {
     }
     private String upload(File uploadFile, String dirName, MemberDetails memberDetails) throws NoSuchAlgorithmException {
         //filename로 받고 -> uploadImageUrl을 반환 받음
-        String fileName = memberDetails.getNickname();
+        String fileName = memberDetails.getUsername();
         String cryptogram = encrypt(fileName);// S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, dirName+"/"+cryptogram); // s3로 업로드
         removeNewFile(uploadFile);

@@ -169,27 +169,22 @@ public class MemberService {
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
+        if (file != null) {
+            InputStream inputStream = file.getInputStream();
 
-        InputStream inputStream = file.getInputStream();
-
-        if(!file.isEmpty()) {
             boolean isValid = FileUtils.validImgFile(inputStream);
             if(!isValid) {
                 // exception 처리
-                System.out.println("이미지 파일만 업로드 가능합니다.");
-                throw new MultipartStream.IllegalBoundaryException("이건 안됨 ㄴㄴ임");
+                return new ResponseEntity<>(
+                        MemberUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                        HttpStatus.valueOf(StatusCode.BAD_REQUEST));
             }
             else {
                 String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
                 member.updateProfileImage(fileUrl);
             }
-        }
 
-        // 분기 처리
-//        if (file != null) {
-//            String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
-//            member.updateProfileImage(fileUrl);
-//        }
+        }
 
         // TODO: Step 1. 똑같은 정보를 준건지, 하나라도 수정이 된건지 체크! -> 조건문으로 분기처리를해서 돌아가는지 테스트해봐야할듯.(DB에 최소한으로 다녀오기!)
         // TODO: Step 2. S3에 저장하기(S3에 저장해야 해당 파일에 대한 url에 반환되기 때문에!)
