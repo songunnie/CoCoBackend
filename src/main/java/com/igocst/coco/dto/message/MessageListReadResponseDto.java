@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class MessageListReadResponseDto {
     private Long id;
     private String title;
+    private String receiver;
     private String sender;
     private Boolean readState;
     private LocalDateTime createDate;

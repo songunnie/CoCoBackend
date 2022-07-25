@@ -36,10 +36,10 @@ public class MessageService {
 
         Optional<Member> receivedMemberOptional = memberRepository.findByNickname(messageCreateRequestDto.getReceiver());
         if(receivedMemberOptional.isEmpty()) {
-            log.error("nickname={}, error={}", messageCreateRequestDto.getReceiver(), "쪽지 수신자를 찾을 수 없음");
+            log.error("nickname={}, error={}", messageCreateRequestDto.getReceiver(), "쪽지 수신자가 존재하지 않음");
             return new ResponseEntity<>(
-                    MessageCreateResponseDto.builder().status(StatusMessage.SUCCESS).build(),
-                    HttpStatus.valueOf(StatusCode.SUCCESS)
+                    MessageCreateResponseDto.builder().status(StatusMessage.UNKNOWN_RECEIVER).build(),
+                    HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         };
 
@@ -103,6 +103,7 @@ public class MessageService {
     }
 
     // 쪽지 리스트 읽기
+    // 받은 쪽지 리스트
     @Transactional
     public ResponseEntity<List<MessageListReadResponseDto>> getMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
 
@@ -124,6 +125,26 @@ public class MessageService {
         }
         return new ResponseEntity<>(messageList, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
+
+    // 보낸 쪽지 리스트
+    @Transactional
+    public ResponseEntity<List<MessageListReadResponseDto>> getSendMessageList(@AuthenticationPrincipal MemberDetails memberDetails) {
+        Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
+
+        List<Message> sendMessages = memberOptional.get().getSendMessage();
+        List<MessageListReadResponseDto> sendMessageList = new ArrayList<>();
+        for (Message m : sendMessages) {
+            sendMessageList.add(MessageListReadResponseDto.builder()
+                .id(m.getId())
+                .title(m.getTitle())
+                .receiver(m.getReceiver().getNickname())
+                .readState(m.isReadState())
+                .createDate(m.getCreateDate())
+                .status(StatusMessage.SUCCESS)
+                .build());
+    }
+        return new ResponseEntity<>(sendMessageList, HttpStatus.valueOf(StatusCode.SUCCESS));
+}
 
     // 쪽지 삭제
     @Transactional
