@@ -15,9 +15,11 @@ import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
+import com.igocst.coco.util.FileUtils;
 import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -166,11 +169,27 @@ public class MemberService {
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
-        // 분기 처리
-        if (file != null) {
-            String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
-            member.updateProfileImage(fileUrl);
+
+        InputStream inputStream = file.getInputStream();
+
+        if(!file.isEmpty()) {
+            boolean isValid = FileUtils.validImgFile(inputStream);
+            if(!isValid) {
+                // exception 처리
+                System.out.println("이미지 파일만 업로드 가능합니다.");
+                throw new MultipartStream.IllegalBoundaryException("이건 안됨 ㄴㄴ임");
+            }
+            else {
+                String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
+                member.updateProfileImage(fileUrl);
+            }
         }
+
+        // 분기 처리
+//        if (file != null) {
+//            String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
+//            member.updateProfileImage(fileUrl);
+//        }
 
         // TODO: Step 1. 똑같은 정보를 준건지, 하나라도 수정이 된건지 체크! -> 조건문으로 분기처리를해서 돌아가는지 테스트해봐야할듯.(DB에 최소한으로 다녀오기!)
         // TODO: Step 2. S3에 저장하기(S3에 저장해야 해당 파일에 대한 url에 반환되기 때문에!)
