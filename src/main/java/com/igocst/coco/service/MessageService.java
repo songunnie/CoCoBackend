@@ -8,6 +8,7 @@ import com.igocst.coco.dto.message.*;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.MessageRepository;
 import com.igocst.coco.security.MemberDetails;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -52,12 +53,11 @@ public class MessageService {
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST)
             );
         }
-
         // message 보내는 코드
         Message message = Message.builder()
                 .receiver(receivedMember)
-                .title(messageCreateRequestDto.getTitle())
-                .content(messageCreateRequestDto.getContent())
+                .title(XssPreventer.escape(messageCreateRequestDto.getTitle()))
+                .content(XssPreventer.escape(messageCreateRequestDto.getContent()))
                 .createDate(messageCreateRequestDto.getCreateDate())
                 .build();
 
