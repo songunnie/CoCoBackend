@@ -9,6 +9,7 @@ import com.igocst.coco.dto.post.*;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,8 +46,8 @@ public class PostService {
         }
 
         Post post = Post.builder()
-                .title(postSaveRequestDto.getTitle())
-                .content(postSaveRequestDto.getContent())
+                .title(XssPreventer.escape(postSaveRequestDto.getTitle()))
+                .content(XssPreventer.escape(postSaveRequestDto.getContent()))
                 .meetingType(postSaveRequestDto.getMeetingType())
                 .contact(postSaveRequestDto.getContact())
                 .period(postSaveRequestDto.getPeriod())

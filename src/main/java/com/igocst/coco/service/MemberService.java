@@ -15,8 +15,11 @@ import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.s3.S3Service;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.security.jwt.JwtTokenProvider;
+import com.igocst.coco.util.FileUtils;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,7 +123,7 @@ public class MemberService {
         Member member = Member.builder()
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
-                .nickname(requestDto.getNickname())
+                .nickname(XssPreventer.escape(requestDto.getNickname()))
                 .profileImageUrl(requestDto.getProfileImageUrl())
                 .githubUrl(requestDto.getGithubUrl())
                 .portfolioUrl(requestDto.getPortfolioUrl())
@@ -165,10 +169,21 @@ public class MemberService {
 
         //파일을 getfile로 해서 받음
         MultipartFile file = memberUpdateRequestDto.getFile();
-        // 분기 처리
         if (file != null) {
-            String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
-            member.updateProfileImage(fileUrl);
+            InputStream inputStream = file.getInputStream();
+
+            boolean isValid = FileUtils.validImgFile(inputStream);
+            if(!isValid) {
+                // exception 처리
+                return new ResponseEntity<>(
+                        MemberUpdateResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                        HttpStatus.valueOf(StatusCode.BAD_REQUEST));
+            }
+            else {
+                String fileUrl = s3Service.upload(file, "profileImage", memberDetails);
+                member.updateProfileImage(fileUrl);
+            }
+
         }
 
         // TODO: Step 1. 똑같은 정보를 준건지, 하나라도 수정이 된건지 체크! -> 조건문으로 분기처리를해서 돌아가는지 테스트해봐야할듯.(DB에 최소한으로 다녀오기!)
@@ -178,10 +193,10 @@ public class MemberService {
 
         // TODO: password 수정하려면 기존 비번 확인하는거 필요, imageUrl도 추가해야함.
         //그 멤버의 정보를 바꾼다.
-        member.updateNickname(memberUpdateRequestDto.getNickname());
-        member.updateGithubUrl(memberUpdateRequestDto.getGithubUrl());
-        member.updatePortfolioUrl(memberUpdateRequestDto.getPortfolioUrl());
-        member.updateIntroduction(memberUpdateRequestDto.getIntroduction());
+        member.updateNickname(XssPreventer.escape(memberUpdateRequestDto.getNickname()));
+        member.updateGithubUrl(XssPreventer.escape(memberUpdateRequestDto.getGithubUrl()));
+        member.updatePortfolioUrl(XssPreventer.escape(memberUpdateRequestDto.getPortfolioUrl()));
+        member.updateIntroduction(XssPreventer.escape(memberUpdateRequestDto.getIntroduction()));
 
         return new ResponseEntity<>(
                 MemberUpdateResponseDto.builder().status(StatusMessage.SUCCESS).build(),

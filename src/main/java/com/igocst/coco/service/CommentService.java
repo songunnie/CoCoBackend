@@ -11,6 +11,7 @@ import com.igocst.coco.repository.CommentRepository;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
 import com.igocst.coco.security.MemberDetails;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,9 @@ public class CommentService {
             );
         }
         //Comment를 하나 만들고
-        Comment comment = Comment.builder().content(commentCreateRequestDto.getContent()).build();
+        Comment comment = Comment.builder()
+                .content(XssPreventer.escape(commentCreateRequestDto.getContent()))
+                .build();
         /*주인에게 연관관계 메소드를 통해 "이 댓글 내거야!" 하고 말해줌
         comment는 repo에서 꺼내온게 아니기 때문에 영속성이 없는상태
         post가 영속성이기 때문에 comment도 연관관계 매핑을 통해 영속성으로 들어감*/

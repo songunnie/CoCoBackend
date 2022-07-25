@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://www.cocoding.xyz"));
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.headers().frameOptions().disable();
-        http.cors();
+//        http.cors();
 
         // TODO: permitAll을 하면 /user를 사용하는 모든 사람들에게 모든걸 허용해준 것! 다시 한번 살펴보기
         // JWT 사용 위해 세션 안씀

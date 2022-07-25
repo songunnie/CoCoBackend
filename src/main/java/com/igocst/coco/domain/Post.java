@@ -2,6 +2,7 @@ package com.igocst.coco.domain;
 
 import com.igocst.coco.domain.timestamped.Timestamped;
 import com.igocst.coco.dto.post.PostUpdateRequestDto;
+import com.nhncorp.lucy.security.xss.XssPreventer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,8 +63,8 @@ public class Post extends Timestamped {
      * 비즈니스 로직
      * 게시글 수정 */
     public void updatePost(PostUpdateRequestDto requestDto) {
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
+        this.title = XssPreventer.escape(requestDto.getTitle());
+        this.content = XssPreventer.escape(requestDto.getContent());
         this.recruitmentState = requestDto.isRecruitmentState();
         this.meetingType = requestDto.getMeetingType();
         this.period = requestDto.getPeriod();
