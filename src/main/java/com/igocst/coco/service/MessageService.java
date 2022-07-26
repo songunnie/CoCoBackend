@@ -92,7 +92,9 @@ public class MessageService {
 
         return new ResponseEntity<>(
                 MessageReadResponseDto.builder()
-                        .sender(message.getSender().getEmail())
+                        .id(message.getId())
+                        .member(member.getNickname())
+                        .sender(message.getSender().getNickname())
                         .title(message.getTitle())
                         .content(message.getContent())
                         .readState(message.isReadState())

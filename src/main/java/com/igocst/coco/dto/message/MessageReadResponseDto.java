@@ -6,6 +6,8 @@ import lombok.Getter;
 @Builder
 @Getter
 public class MessageReadResponseDto {
+    private Long id;
+    private String member;
     private String sender;
     private String title;
     private String content;

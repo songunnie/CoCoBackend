@@ -141,6 +141,11 @@ public class Member extends Timestamped {
                 return Optional.ofNullable(message);
             }
         }
+        for (Message message : sendMessage) {
+            if (message.getId() == messageId) {
+                return Optional.ofNullable(message);
+            }
+        }
         return Optional.empty();
     }
 
@@ -154,6 +159,13 @@ public class Member extends Timestamped {
         while (iterator.hasNext()) {
             if (iterator.next().getId().equals(messageId)) {
                 iterator.remove();
+                return true;
+            }
+        }
+        Iterator<Message> sendIterator = sendMessage.iterator();
+        while (sendIterator.hasNext()) {
+            if (sendIterator.next().getId().equals(messageId)) {
+                sendIterator.remove();
                 return true;
             }
         }
