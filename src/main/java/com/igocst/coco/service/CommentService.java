@@ -7,6 +7,7 @@ import com.igocst.coco.domain.Member;
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.domain.Post;
 import com.igocst.coco.dto.comment.*;
+import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.repository.CommentRepository;
 import com.igocst.coco.repository.MemberRepository;
 import com.igocst.coco.repository.PostRepository;
@@ -112,6 +113,25 @@ public class CommentService {
         return new ResponseEntity<>(output, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
+    // 댓글 하나 조회
+    public ResponseEntity<CommentReadResponseDto> readCommentDetail(Long commentId, MemberDetails memberDetails) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        Comment findComment = commentOptional.get();
+
+        return new ResponseEntity<>(
+                CommentReadResponseDto.builder()
+                        .status(StatusMessage.SUCCESS)
+                        .id(findComment.getId())
+                        .nickname(findComment.getMember().getNickname())
+                        .portfolioUrl(findComment.getMember().getPortfolioUrl())
+                        .githubUrl(findComment.getMember().getGithubUrl())
+                        .introduction(findComment.getMember().getIntroduction())
+                        .profileImageUrl(findComment.getMember().getProfileImageUrl())
+                        .build(),
+                HttpStatus.valueOf(StatusCode.SUCCESS)
+        );
+    }
     //댓글 수정
     @Transactional
     public ResponseEntity<CommentUpdateResponseDto> updateComment(CommentUpdateRequestDto commentUpdateRequestDto,
