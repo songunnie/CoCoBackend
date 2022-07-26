@@ -11,6 +11,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
     List<Post> findAllByOrderByLastModifiedDateDesc();
     List<Post> findAllByMember_IdOrderByLastModifiedDateDesc(Long id);
+    List<Post> findAllByTitleContainingOrderByCreateDateDesc(String query);
 
     @Modifying
     @Query("update Post p set p.hits = p.hits + 1 where p.id = :id")
