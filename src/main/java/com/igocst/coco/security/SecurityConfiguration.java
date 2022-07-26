@@ -69,6 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/post/list").permitAll()
                 .antMatchers("/post/recruit/list").permitAll()
+                .antMatchers("/post/search").permitAll()
                 // 이외의 URI는 인증을 거친다.
                 .anyRequest()
                 .authenticated()

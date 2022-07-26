@@ -270,4 +270,28 @@ public class PostService {
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
     }
+
+    // 게시글 검색
+    public ResponseEntity<List<PostReadResponseDto>> searchPost(String query) {
+        // 검색값이 포함되어 있는 게시글을 가져옮
+        List<Post> searchPosts = postRepository.findAllByTitleContainingOrderByCreateDateDesc(query);
+        List<PostReadResponseDto> searchList = new ArrayList<>();
+        for (Post post : searchPosts) {
+            searchList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getLastModifiedDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(searchList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
 }
