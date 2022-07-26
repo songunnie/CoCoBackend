@@ -141,6 +141,11 @@ public class Member extends Timestamped {
                 return Optional.ofNullable(message);
             }
         }
+        for (Message message : sendMessage) {
+            if (message.getId() == messageId) {
+                return Optional.ofNullable(message);
+            }
+        }
         return Optional.empty();
     }
 
