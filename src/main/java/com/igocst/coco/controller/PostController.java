@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
@@ -31,8 +33,10 @@ public class PostController {
     // 게시글 상세 조회
     @GetMapping("/post/{postId}")
     public ResponseEntity<PostReadResponseDto> readPost(@PathVariable Long postId,
-                                        @AuthenticationPrincipal MemberDetails memberDetails) {
-        return postService.readPost(postId, memberDetails);
+                                                        @AuthenticationPrincipal MemberDetails memberDetails,
+                                                        HttpServletRequest request,
+                                                        HttpServletResponse response) {
+        return postService.readPost(postId, memberDetails, request, response);
     }
 
     // 게시글 전체 목록 조회
