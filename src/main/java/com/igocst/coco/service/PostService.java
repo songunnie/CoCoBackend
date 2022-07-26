@@ -107,7 +107,7 @@ public class PostService {
                         .period(findPost.getPeriod())
                         .recruitmentState(findPost.isRecruitmentState())
                         .hits(findPost.getHits())
-                        .postDate(findPost.getLastModifiedDate())
+                        .postDate(findPost.getCreateDate())
                         .writer(findPost.getMember().getNickname())
                         .githubUrl(findPost.getMember().getGithubUrl())
                         .portfolioUrl(findPost.getMember().getPortfolioUrl())
@@ -124,7 +124,7 @@ public class PostService {
     // 게시글 목록 전체 조회
     public ResponseEntity<List<PostReadResponseDto>> readPostList() {
         // 1. 게시글을 다 가져온다
-        List<Post> posts = postRepository.findAllByOrderByLastModifiedDateDesc();
+        List<Post> posts = postRepository.findAllByOrderByCreateDateDesc();
         // 2. 가져온 게시글을 DTO 목록에 담아 반환한다.
         List<PostReadResponseDto> postList = new ArrayList<>();
 
@@ -139,7 +139,7 @@ public class PostService {
                     .period(post.getPeriod())
                     .recruitmentState(post.isRecruitmentState())
                     .hits(post.getHits())
-                    .postDate(post.getLastModifiedDate())
+                    .postDate(post.getCreateDate())
                     .writer(post.getMember().getNickname())
                     .build()
             );
@@ -150,7 +150,7 @@ public class PostService {
 
     // 게시글 목록 조회 (모집 중인거만)
     public ResponseEntity<List<PostReadResponseDto>> readRecruitingPostList() {
-        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalseOrderByLastModifiedDateDesc();
+        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalseOrderByCreateDateDesc();
         List<PostReadResponseDto> recrutingPostList = new ArrayList<>();
 
         for (Post post : recrutingPosts) {
@@ -164,7 +164,7 @@ public class PostService {
                     .period(post.getPeriod())
                     .recruitmentState(post.isRecruitmentState())
                     .hits(post.getHits())
-                    .postDate(post.getLastModifiedDate())
+                    .postDate(post.getCreateDate())
                     .writer(post.getMember().getNickname())
                     .build()
             );
