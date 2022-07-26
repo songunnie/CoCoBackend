@@ -2,6 +2,7 @@ package com.igocst.coco.controller;
 
 import com.igocst.coco.domain.MemberRole;
 import com.igocst.coco.dto.comment.*;
+import com.igocst.coco.dto.post.PostReadResponseDto;
 import com.igocst.coco.security.MemberDetails;
 import com.igocst.coco.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,13 @@ public class CommentController {
     public ResponseEntity<List<CommentReadResponseDto>> readComment(@PathVariable Long postId,
                                                     @AuthenticationPrincipal MemberDetails memberDetails) {
         return commentService.readCommentList(postId, memberDetails);
+    }
+
+    // 댓글 하나 읽기
+    @GetMapping("/comment/{commentId}")
+    public ResponseEntity<CommentReadResponseDto> readCommentDetail(@PathVariable Long commentId,
+                                                                    @AuthenticationPrincipal MemberDetails memberDetails) {
+        return commentService.readCommentDetail(commentId, memberDetails);
     }
 
     // 댓글 수정

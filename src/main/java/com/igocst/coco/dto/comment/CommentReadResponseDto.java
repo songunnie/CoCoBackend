@@ -21,5 +21,9 @@ public class CommentReadResponseDto {
     private boolean enableDelete;
     // 관리자 여부 체크
     private MemberRole memberRole;
+    // 멤버 정보 읽기
     private String profileImageUrl;
+    private String githubUrl;
+    private String portfolioUrl;
+    private String introduction;
 }
