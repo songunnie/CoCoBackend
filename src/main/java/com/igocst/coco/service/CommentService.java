@@ -103,6 +103,7 @@ public class CommentService {
                     .nickname(c.getMember().getNickname())
                     .profileImageUrl(c.getMember().getProfileImageUrl())
                     .createDate(c.getCreateDate())
+                    .modifyDate(c.getLastModifiedDate())
                     .status(StatusMessage.SUCCESS)
                     .enableDelete(enableDelete)
                     .memberRole(memberRole)
