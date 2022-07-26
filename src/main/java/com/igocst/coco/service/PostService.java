@@ -113,7 +113,7 @@ public class PostService {
                         .period(findPost.getPeriod())
                         .recruitmentState(findPost.isRecruitmentState())
                         .hits(findPost.getHits())
-                        .postDate(findPost.getLastModifiedDate())
+                        .postDate(findPost.getCreateDate())
                         .writer(findPost.getMember().getNickname())
                         .githubUrl(findPost.getMember().getGithubUrl())
                         .portfolioUrl(findPost.getMember().getPortfolioUrl())
@@ -144,7 +144,7 @@ public class PostService {
                 increaseHits(postId);
                 oldCookie.setValue(oldCookie.getValue() + "_[" + postId + "]");
                 oldCookie.setPath("/");
-                oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
+                oldCookie.setMaxAge(60 * 60 * 24);
                 response.addCookie(oldCookie);
             }
         } else {
@@ -152,7 +152,6 @@ public class PostService {
             Cookie newCookie = new Cookie("postView", "[" + postId + "]");
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60 * 24);
-            // 쿠키 시간
             response.addCookie(newCookie);
         }
     }
