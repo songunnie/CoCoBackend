@@ -162,6 +162,13 @@ public class Member extends Timestamped {
                 return true;
             }
         }
+        Iterator<Message> sendIterator = sendMessage.iterator();
+        while (sendIterator.hasNext()) {
+            if (sendIterator.next().getId().equals(messageId)) {
+                sendIterator.remove();
+                return true;
+            }
+        }
         return false;
     }
 
