@@ -16,6 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +69,7 @@ public class PostService {
 
     // 게시글 내용(상세) 조회
     @Transactional
-    public ResponseEntity<PostReadResponseDto> readPost(Long postId, MemberDetails memberDetails) {
+    public ResponseEntity<PostReadResponseDto> readPost(Long postId, MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response) {
         // 로그인된 사용자의 정보가 필요 (로그인된 사용자가 아니면 접근 불가, JWT로 인증이 안되면 접근 불가)
 
         // 1. postId에 해당하는 게시글 조회
@@ -94,7 +98,9 @@ public class PostService {
             memberRole = MemberRole.ADMIN;
             enableDelete = true;
         }
-        postRepository.updateHits(postId);
+
+        // 조회 수 중복 방지
+        updateHits(postId, request, response);
 
         return new ResponseEntity<>(
                 PostReadResponseDto.builder()
@@ -107,7 +113,7 @@ public class PostService {
                         .period(findPost.getPeriod())
                         .recruitmentState(findPost.isRecruitmentState())
                         .hits(findPost.getHits())
-                        .postDate(findPost.getCreateDate())
+                        .postDate(findPost.getLastModifiedDate())
                         .writer(findPost.getMember().getNickname())
                         .githubUrl(findPost.getMember().getGithubUrl())
                         .portfolioUrl(findPost.getMember().getPortfolioUrl())
@@ -119,6 +125,42 @@ public class PostService {
                         .build(),
                 HttpStatus.valueOf(StatusCode.SUCCESS)
         );
+    }
+
+    // 조회 수 중복 방지
+    private void updateHits(Long postId, HttpServletRequest request, HttpServletResponse response) {
+        Cookie oldCookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("postView")) {
+                    oldCookie = cookie;
+                }
+            }
+        }
+
+        if (oldCookie != null) {
+            if (!oldCookie.getValue().contains("["+ postId.toString() +"]")) {
+                increaseHits(postId);
+                oldCookie.setValue(oldCookie.getValue() + "_[" + postId + "]");
+                oldCookie.setPath("/");
+                oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
+                response.addCookie(oldCookie);
+            }
+        } else {
+            increaseHits(postId);
+            Cookie newCookie = new Cookie("postView", "[" + postId + "]");
+            newCookie.setPath("/");
+            newCookie.setMaxAge(60 * 60 * 24);
+            // 쿠키 시간
+            response.addCookie(newCookie);
+        }
+    }
+
+    // 조회수 증가 로직
+    @Transactional
+    public int increaseHits(Long id) {
+        return postRepository.updateHits(id);
     }
 
     // 게시글 목록 전체 조회
