@@ -286,7 +286,7 @@ public class MemberService {
     public ResponseEntity<List<PostReadResponseDto>> readMyPosts(MemberDetails memberDetails) {
 
         // 1. 로그인한 사용자의 게시글 전부 가져와서 반환
-        List<Post> posts = postRepository.findAllByMember_IdOrderByLastModifiedDateDesc(memberDetails.getMember().getId());
+        List<Post> posts = postRepository.findAllByMember_IdOrderByCreateDateDesc(memberDetails.getMember().getId());
         List<PostReadResponseDto> postList = new ArrayList<>();
         for (Post post : posts) {
             postList.add(PostReadResponseDto.builder()
@@ -299,7 +299,7 @@ public class MemberService {
                     .period(post.getPeriod())
                     .recruitmentState(post.isRecruitmentState())
                     .hits(post.getHits())
-                    .postDate(post.getLastModifiedDate())
+                    .postDate(post.getCreateDate())
                     .writer(post.getMember().getNickname())
                     .build()
             );
