@@ -33,13 +33,6 @@ public class CommentController {
         return commentService.readCommentList(postId, memberDetails);
     }
 
-    // 댓글 하나 읽기
-    @GetMapping("/comment/{commentId}")
-    public ResponseEntity<CommentReadResponseDto> readCommentDetail(@PathVariable Long commentId,
-                                                                    @AuthenticationPrincipal MemberDetails memberDetails) {
-        return commentService.readCommentDetail(commentId, memberDetails);
-    }
-
     // 댓글 수정
     @PutMapping("/comment/{commentId}")
     public ResponseEntity<CommentUpdateResponseDto> updateComment(@RequestBody CommentUpdateRequestDto commentUpdateRequestDto,

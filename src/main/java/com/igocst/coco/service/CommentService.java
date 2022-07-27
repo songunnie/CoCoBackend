@@ -103,6 +103,9 @@ public class CommentService {
                     .comments(c.getContent())
                     .nickname(c.getMember().getNickname())
                     .profileImageUrl(c.getMember().getProfileImageUrl())
+                    .githubUrl(c.getMember().getGithubUrl())
+                    .portfolioUrl(c.getMember().getPortfolioUrl())
+                    .introduction(c.getMember().getIntroduction())
                     .createDate(c.getCreateDate())
                     .modifyDate(c.getLastModifiedDate())
                     .status(StatusMessage.SUCCESS)
@@ -113,25 +116,6 @@ public class CommentService {
         return new ResponseEntity<>(output, HttpStatus.valueOf(StatusCode.SUCCESS));
     }
 
-    // 댓글 하나 조회
-    public ResponseEntity<CommentReadResponseDto> readCommentDetail(Long commentId, MemberDetails memberDetails) {
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
-
-        Comment findComment = commentOptional.get();
-
-        return new ResponseEntity<>(
-                CommentReadResponseDto.builder()
-                        .status(StatusMessage.SUCCESS)
-                        .id(findComment.getId())
-                        .nickname(findComment.getMember().getNickname())
-                        .portfolioUrl(findComment.getMember().getPortfolioUrl())
-                        .githubUrl(findComment.getMember().getGithubUrl())
-                        .introduction(findComment.getMember().getIntroduction())
-                        .profileImageUrl(findComment.getMember().getProfileImageUrl())
-                        .build(),
-                HttpStatus.valueOf(StatusCode.SUCCESS)
-        );
-    }
     //댓글 수정
     @Transactional
     public ResponseEntity<CommentUpdateResponseDto> updateComment(CommentUpdateRequestDto commentUpdateRequestDto,
