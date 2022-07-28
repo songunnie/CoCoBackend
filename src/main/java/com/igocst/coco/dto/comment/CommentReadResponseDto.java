@@ -19,6 +19,7 @@ public class CommentReadResponseDto {
     private LocalDateTime modifyDate;
     // 댓글을 삭제 할 수 있는지 여부 체크
     private boolean enableDelete;
+    private boolean enableUpdate;
     // 관리자 여부 체크
     private MemberRole memberRole;
     // 멤버 정보 읽기

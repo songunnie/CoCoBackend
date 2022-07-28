@@ -82,13 +82,16 @@ public class CommentService {
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentReadResponseDto> output = new ArrayList<>();
         boolean enableDelete;
+        boolean enableUpdate;
 
         for(Comment c : comments) {
             enableDelete = false;
+            enableUpdate = false;
 
-            // 로그인한 회원은 본인이 작성한 댓글만 삭제할 수 있다.
+            // 로그인한 회원은 본인이 작성한 댓글만 수정, 삭제할 수 있다.
             if (c.getMember().getId() == memberDetails.getMember().getId()) {
                 enableDelete = true;
+                enableUpdate = true;
             }
 
             // 현재 로그인한 회원이 관리자라면 모든 댓글을 삭제할 수 있다.
@@ -110,6 +113,7 @@ public class CommentService {
                     .modifyDate(c.getLastModifiedDate())
                     .status(StatusMessage.SUCCESS)
                     .enableDelete(enableDelete)
+                    .enableUpdate(enableUpdate)
                     .memberRole(memberRole)
                     .build());
         }
