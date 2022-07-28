@@ -21,6 +21,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -211,6 +212,126 @@ public class PostService {
             );
         }
         return new ResponseEntity<>(recrutingPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
+
+    // 조회수순 게시글 목록 조회 (모집 중인거만)
+    public ResponseEntity<List<PostReadResponseDto>> readRecruitingHitsPostList() {
+        List<Post> recrutingHitsPosts = postRepository.findAllByRecruitmentStateFalseOrderByHitsDesc();
+        List<PostReadResponseDto> recrutingHitsPostList = new ArrayList<>();
+        for (Post post : recrutingHitsPosts) {
+            recrutingHitsPostList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getCreateDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(recrutingHitsPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
+
+    // 조회수순 게시글 목록 조회 (모집 마감 포함)
+    public ResponseEntity<List<PostReadResponseDto>> readHitsPostList() {
+        List<Post> hitsPosts = postRepository.findAllByOrderByHitsDesc();
+        List<PostReadResponseDto> hitsPostList = new ArrayList<>();
+        for (Post post : hitsPosts) {
+            hitsPostList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getCreateDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(hitsPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
+
+    // 댓글 많은 순으로 게시글 목록 조회 (모집 중인거만)
+    public ResponseEntity<List<PostReadResponseDto>> readRecruitingCommentsPostList() {
+        List<Post> recrutingPosts = postRepository.findAllByRecruitmentStateFalse();
+        // 댓글 많은 순으로 정렬
+        getCommentsPosts(recrutingPosts);
+
+        List<PostReadResponseDto> recruitCommentsPostList = new ArrayList<>();
+        for (Post post : recrutingPosts) {
+            recruitCommentsPostList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getCreateDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(recruitCommentsPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
+
+    // 댓글 많은 순으로 게시글 목록 조회 (모집 마감 포함)
+    public ResponseEntity<List<PostReadResponseDto>> readCommentsPostList() {
+        // 1. 모든 게시글 가져온다
+        // 2. 각 게시글의 달린 댓글을 검사
+        // 3. 댓글이 많은 순으로 정렬?
+
+        List<Post> posts = postRepository.findAll();
+        // 댓글 많은 순으로 정렬
+        getCommentsPosts(posts);
+
+        List<PostReadResponseDto> commentsPostList = new ArrayList<>();
+        for (Post post : posts) {
+            commentsPostList.add(PostReadResponseDto.builder()
+                    .status(StatusMessage.SUCCESS)
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .meetingType(post.getMeetingType())
+                    .contact(post.getContact())
+                    .period(post.getPeriod())
+                    .recruitmentState(post.isRecruitmentState())
+                    .hits(post.getHits())
+                    .postDate(post.getCreateDate())
+                    .writer(post.getMember().getNickname())
+                    .build()
+            );
+        }
+        return new ResponseEntity<>(commentsPostList, HttpStatus.valueOf(StatusCode.SUCCESS));
+    }
+
+    // 댓글수 내림차순으로 게시글 정렬
+    private List<Post> getCommentsPosts(List<Post> posts) {
+        for (int i = 0; i< posts.size()-1; i++) {
+            boolean swap = false;
+
+            for (int j = 0; j< posts.size()-1-i; j++) {
+                if(posts.get(j).getComments().size() < posts.get(j+1).getComments().size()) {
+                    Collections.swap(posts, j, j+1);
+                    swap = true;
+                }
+            }
+            if (swap == false) {
+                break;
+            }
+        }
+        return posts;
     }
 
     //  게시글 수정

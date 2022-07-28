@@ -46,9 +46,33 @@ public class PostController {
     }
 
     // 모집 중인 게시글 목록 조회
-    @GetMapping("/post/recruit/list")
+    @GetMapping("/post/list/recruit")
     public ResponseEntity<List<PostReadResponseDto>> readRecruitingPostList() {
         return postService.readRecruitingPostList();
+    }
+
+    // 조회수순 게시글 목록 조회 (모집 중)
+    @GetMapping("/post/list/recruit/hits")
+    public ResponseEntity<List<PostReadResponseDto>> readRecruitingHitsPostList() {
+        return postService.readRecruitingHitsPostList();
+    }
+
+    // 조회수순 게시글 목록 조회 (모집 마감 포함)
+    @GetMapping("/post/list/hits")
+    public ResponseEntity<List<PostReadResponseDto>> readHitsPostList() {
+        return postService.readHitsPostList();
+    }
+
+    // 댓글 많은 순 게시글 목록 조회 (모집 중)
+    @GetMapping("/post/list/recruit/comments")
+    public ResponseEntity<List<PostReadResponseDto>> readRecruitingCommentsPostList() {
+        return postService.readRecruitingCommentsPostList();
+    }
+
+    // 댓글 많은 순 게시글 목록 조회 (모집 마감 포함)
+    @GetMapping("/post/list/comments")
+    public ResponseEntity<List<PostReadResponseDto>> readCommentsPostList() {
+        return postService.readCommentsPostList();
     }
 
     // 게시글 수정
