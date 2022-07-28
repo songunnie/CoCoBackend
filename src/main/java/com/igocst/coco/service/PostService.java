@@ -145,6 +145,7 @@ public class PostService {
                 increaseHits(postId);
                 oldCookie.setValue(oldCookie.getValue() + "_[" + postId + "]");
                 oldCookie.setPath("/");
+                oldCookie.setDomain("cocoding.xyz");
                 oldCookie.setMaxAge(60 * 60 * 24);
                 response.addCookie(oldCookie);
             }
@@ -152,6 +153,7 @@ public class PostService {
             increaseHits(postId);
             Cookie newCookie = new Cookie("postView", "[" + postId + "]");
             newCookie.setPath("/");
+            newCookie.setDomain("cocoding.xyz");
             newCookie.setMaxAge(60 * 60 * 24);
             response.addCookie(newCookie);
         }
