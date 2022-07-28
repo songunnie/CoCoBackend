@@ -117,7 +117,8 @@ public class Member extends Timestamped {
             return Optional.empty();
         }
         for (Comment comment : comments) {
-            if (comment.getId() == commentId) {
+            Long com = comment.getId();
+            if (com.equals(commentId)) {
                 return Optional.ofNullable(comment);
             }
         }
