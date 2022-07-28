@@ -16,7 +16,6 @@ public class FileUtils {
             List<String> notValidTypeList = Arrays.asList("image/jpeg", "image/pjpeg", "image/png", "image/gif", "image/bmp", "image/x-windows-bmp");
 
             String mimeType = tika.detect(inputStream);
-            System.out.println("MimeType : " + mimeType);
 
             boolean isValid = notValidTypeList.stream().anyMatch(notValidType -> notValidType.equalsIgnoreCase(mimeType));
 

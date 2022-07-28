@@ -120,6 +120,7 @@ public class PostService {
                         .portfolioUrl(findPost.getMember().getPortfolioUrl())
                         .introduction(findPost.getMember().getIntroduction())
                         .profileImageUrl(findPost.getMember().getProfileImageUrl())
+                        .loginProfileImage(memberDetails.getMember().getProfileImageUrl())
                         .enableUpdate(enableUpdate)
                         .enableDelete(enableDelete)
                         .memberRole(memberRole)

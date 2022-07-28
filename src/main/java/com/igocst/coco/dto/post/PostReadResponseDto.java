@@ -32,4 +32,5 @@ public class PostReadResponseDto {
     private String portfolioUrl;
     private String introduction;
     private String profileImageUrl;
+    private String loginProfileImage;
 }
