@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+<!--로그 파일 저장 위치-->
+    <property name="LOGS_PATH" value="C:/coco_log/"/>>
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOGS_PATH}log-%d{yyyy-MM-dd_HH, ${logback.timezone:-Asia/Seoul}}.%i.txt</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>80</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%-5level] %d{HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}} %logger{36} %M - %msg%n</pattern>
+        </encoder>
+
+    </appender>
+    <root level="debug">
+        <appender-ref ref="ROLLING"/>
+    </root>
+</configuration>

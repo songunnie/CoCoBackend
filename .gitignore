@@ -1,5 +1,18 @@
-# Python Caches
-**/__pycache__/
+# OS Caches
+**/.DS_Store
 
-# PyCharm Caches
-.idea/
+# JetBrains Caches
+**/.idea/
+**/out/
+
+# Gradle Caches
+**/.gradle/
+**/build/
+
+##applicaton.properties
+#src/main/resources/application.properties
+
+# IntelliJ IDEA
+application-aws.properties
+application-secret.properties
+application-rds.properties
