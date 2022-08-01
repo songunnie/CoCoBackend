@@ -17,4 +17,5 @@ public class BookmarkListReadResponseDto {
     private String period;
     private boolean recruitmentState;
     private int hits;
+    private boolean bookmarkState;
 }
