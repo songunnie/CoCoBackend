@@ -70,7 +70,7 @@ public class MessageService {
         );
     }
 
-    // 쪽지 상세 읽기
+    // 받은 쪽지 상세 읽기
     @Transactional
     public ResponseEntity<MessageReadResponseDto> getMessage(Long messageId, MemberDetails memberDetails) {
 
@@ -139,6 +139,7 @@ public class MessageService {
             sendMessageList.add(MessageListReadResponseDto.builder()
                 .id(m.getId())
                 .title(m.getTitle())
+                .content(m.getContent())
                 .receiver(m.getReceiver().getNickname())
                 .readState(m.isReadState())
                 .createDate(m.getCreateDate())

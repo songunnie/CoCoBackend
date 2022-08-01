@@ -32,7 +32,6 @@ public class BookmarkService {
     // 북마크에 저장하기
     @Transactional
     public ResponseEntity<BookmarkSaveResponseDto> saveBookmark(Long postId, MemberDetails memberDetails) {
-        // 영속성이 없는상태
         Optional<Member> memberOptional = memberRepository.findById(memberDetails.getMember().getId());
         Member member = memberOptional.get();
 
@@ -61,6 +60,7 @@ public class BookmarkService {
         Bookmark bookmark = new Bookmark();
         member.addBookmark(bookmark);
         post.addBookmark(bookmark);
+        bookmark.changeBookmarkState();
         bookmarkRepository.save(bookmark);
 
         return new ResponseEntity<>(
@@ -87,6 +87,7 @@ public class BookmarkService {
                     .period(b.getPost().getPeriod())
                     .recruitmentState(b.getPost().isRecruitmentState())
                     .hits(b.getPost().getHits())
+                    .bookmarkState(b.isBookmarkState())
                     .status(StatusMessage.SUCCESS)
                     .build());
         }
