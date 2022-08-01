@@ -28,13 +28,10 @@ public class Bookmark {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @Column(nullable = false)
-    private boolean bookmarkState;
     public void registerMember(Member member) {
         this.member = member;
     }
     public void registerPost(Post post) {
         this.post = post;
     }
-    public void changeBookmarkState() { this.bookmarkState = true; }
 }
