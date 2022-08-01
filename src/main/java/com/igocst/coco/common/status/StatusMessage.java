@@ -9,4 +9,5 @@ public class StatusMessage {
     public static final String UNAUTHORIZED_USER = "Unauthorized user";
     public static final String FORBIDDEN_USER = "Forbidden user";
     public static final String DUPLICATED_USER = "Duplicated user";
+    public static final String DUPLICATED_BOOKMARK = "Duplicated bookmark";
 }

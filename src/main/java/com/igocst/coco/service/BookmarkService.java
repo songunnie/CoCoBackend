@@ -37,7 +37,7 @@ public class BookmarkService {
 
         Optional<Post> postOptional  = postRepository.findById(postId);
         if(postOptional.isEmpty()) {
-            log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "해당 게시글을 찾을 수 없음");
+            log.error("nickname={}, postId={}, error={}", member.getNickname(), postId, "해당 게시글을 찾을 수 없음");
             return new ResponseEntity<>(
                     BookmarkSaveResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
                     HttpStatus.valueOf(StatusCode.BAD_REQUEST));
@@ -49,9 +49,9 @@ public class BookmarkService {
 
             // 이미 본인이 저장한 북마크는 또 저장할 수 없음
             if (b.getMember().getId() == memberDetails.getMember().getId()) {
-                log.error("nickname={}, messageId={}, error={}", member.getNickname(), postId, "이미 북마크에 저장한 게시글");
+                log.error("nickname={}, postId={}, error={}", member.getNickname(), postId, "이미 북마크에 저장한 게시글");
                 return new ResponseEntity<>(
-                        BookmarkSaveResponseDto.builder().status(StatusMessage.BAD_REQUEST).build(),
+                        BookmarkSaveResponseDto.builder().status(StatusMessage.DUPLICATED_BOOKMARK).build(),
                         HttpStatus.valueOf(StatusCode.BAD_REQUEST)
                 );
             }
