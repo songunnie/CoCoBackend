@@ -9,7 +9,7 @@
 - 개발기간: 2022.06.24 ~ 2022.07.29
 - 참여인원: 3명
 - 소개: 사이드 프로젝트 기획/구인 서비스
-- 주소: <a href='https://www.cocoding.xy' target='_blank'>Coco 방문하기</a>
+- 주소: <a href='https://www.cocoding.xyz' target='_blank'>Coco 방문하기</a>
 <br>
 <br>
 
