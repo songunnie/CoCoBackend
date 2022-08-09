@@ -1,75 +1,128 @@
 # 꿈꿔왔던 사이드 프로젝트가 시작되는 곳, Coco!
-![CocoBanner2](https://user-images.githubusercontent.com/103922744/180134172-04dda2fd-bebd-48ef-9a1c-77ae638b4979.jpg)
+![CocoBanner](https://user-images.githubusercontent.com/103922744/183601123-611da9c2-7cf1-4320-bff1-c2d5b0ca7206.jpg)
+<br>
+<br>
 <br>
 <br>
 
-## 📢 목차
-* [소개](#코코-소개)
-* [기능](#기능)
-* [구성](#구성)
-* [기술 스택](#기술-스택)
-* [과정](#과정)
-* [미리보기](#페이지-미리보기)
-  <br>
-  <br>
-
-## 코코 소개
-### 직접 만들어보고 싶은 사이드 프로젝트가 있으신가요? 그렇다면, Coco를 찾아주세요!
-프로젝트를 직접 기획하거나, 원하는 프로젝트를 찾아 프로젝트에 참여해보시는건 어떠세요?  
-그 프로젝트의 첫 시작, [Coco](https://www.cocoding.xyz)가 함께하고 싶어요 🙋🏻‍♀️ 🙋🏻 🙋🏻‍♂️
-
-- 프로젝트 기획시 원하는 팀원을 모집할 수 있습니다.
-- 원하는 프로젝트가 있다면 팀원으로 참여할 수 있습니다.
-  <br>
-  <br>
-
-## 기능
-| 카테고리 |                기능                 | 기능 내용                                                       |
-| :------: |:---------------------------------:|:------------------------------------------------------------|
-| 회원 | 로그인/로그아웃 </br> 회원가입/탈퇴 </br> 관리자  | 회원가입시/ 이메일,닉네임 중복확인 </br> 이메일, 비밀번호 유효성 검사 </br> 비밀번호 난수화   |
-| 게시글 |               CRUD                | 게시글 작성/읽기/수정/삭제 </br> 글 작성 유저 프로필 보기 </br> 글 작성 유저에게 쪽지 보내기 |
-| 쪽지 |                CRD                | 쪽지보내기 </br> 쪽지 읽지 않음/읽음 표시 </br> 쪽지 삭제 </br> 받은 쪽지 보기       |
-| 댓글 |                CRD                | 댓글 작성 </br> 댓글 삭제 </br> 댓글 리스트 보기                           |
-| 프로필 |                RU                 | 프로필 보기 </br> 프로필 수정                                         |
-| 북마크 |                CRD                | 북마크 저장 </br> 북마크 삭제 </br> 북마크 리스트 보기                        |
-| 필터 |              게시글 필터               | 게시글 모집중 / 모집완료 필터                                           |
+## 1. 프로젝트 개요
+- 개발기간: 2022.06.24 ~ 2022.07.29
+- 참여인원: 3명
+- 소개: 사이드 프로젝트 기획/구인 서비스
+- 주소: <a href='https://www.cocoding.xy' target='_blank'>Coco 방문하기</a>
 <br>
 <br>
 
-## 구성
+## 2. 사용기술
+- Backend: `Java 11` `Spring Boot` `Spring Data JPA`
+- Database: `AWS RDS` `MySQL` `H2`
+- Security: `Spring Security`
+- Cloud: `AWS S3` `AWS EC2`
+- CI/CD: `Github Actions`
+<br>
+<br>
+
+## 3. ERD 설계
+<p align="center">
+ <img width="652" alt="스크린샷 2022-08-09 오후 5 15 17" src="https://user-images.githubusercontent.com/103922744/183599831-272abb85-f55e-4e1f-8d7f-16daffcc523f.png">
+</p>
+<br>
+<br>
+
+## 4. 프로젝트 
 #### Architecture Version 1
-<img width="948" alt="아키텍처 ver1 5" src="https://user-images.githubusercontent.com/103922744/180138551-c0171505-641b-436b-820e-30d56fef0423.png">
+<img width="1549" alt="스크린샷 2022-08-09 오후 2 20 22" src="https://user-images.githubusercontent.com/103922744/183616139-859ea582-38e9-4cdb-b712-982170e8b7fe.png">
 <br>
 <br>
 
-## 기술 스택
-| Backend | <img src="https://img.shields.io/badge/JAVA-E85C33?style=for-the-badge&logo=Python&logoColor=white">  <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Security-137CBD?style=for-the-badge&logo=Spring Security&logoColor=white"> <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"> <img src="https://img.shields.io/badge/JPA-E97627?style=for-the-badge&logo=JPA&logoColor=white">                                                                                                                                                                                                    |
-| ------ |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Frontend | <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"> <img src="https://img.shields.io/badge/Webpack-8DD6F9?style=for-the-badge&logo=Webpack&logoColor=white"> <img src="https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jQuery&logoColor=white"> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white"> <img src="https://img.shields.io/badge/Bulma-00D1B2?style=for-the-badge&logo=Bulma&logoColor=white"> <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white"> <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=CSS3&logoColor=white">       |
-| DB | <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| CLOUD | <img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=Amazon AWS&logoColor=white"> <img src="https://img.shields.io/badge/Amazon Amazon S3-569A31?style=for-the-badge&logo=Amazon Amazon S3&logoColor=white"> <img src="https://img.shields.io/badge/Amazon Amazon RDS-527FFF?style=for-the-badge&logo=Amazon Amazon RDS&logoColor=white"> <img src="https://img.shields.io/badge/Amazon Amazon EC2-FF9900?style=for-the-badge&logo=Amazon Amazon EC2&logoColor=white">                                                                                                                                                                                                                                                        |
-| ETC | <img src="https://img.shields.io/badge/Amazon Git-F05032?style=for-the-badge&logo=Amazon Git&logoColor=white"> <img src="https://img.shields.io/badge/Amazon GitHub-181717?style=for-the-badge&logo=Amazon GitHub&logoColor=white"> <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=for-the-badge&logo=GitHub Actions&logoColor=white">                                                                                                                                                                                                                                                                                                                                                                                                 |
+
+## 5. 맡은 기능
+대표 기능: `댓글` / `프로필 페이지`
+- 게시글 상세페이지 댓글 CRUD
+- 프로필 페이지를 위한 회원정보 획득
+- 프로필 페이지를 위한 회원정보 수정
+- 닉네임 중복 방지
+- 프로필 이미지 업로드 - S3 연동
+- 이미지 파일 확장자 필터
+- XSS 보안
 <br>
 <br>
 
-## 과정
+## 6. 어려움을 선물 받은 기능
+### 🎞 프로필 이미지 S3 연동  
+> #### 6-1 기존 방식
+- 처음에는 프로필 기능을 맡게 되었을 때 '내가 과연 할 수 있을까?'라며 기대 반, 우려 반을 가지고 몇번이나 자문해야했던 기능이었습니다.  
+- 먼저, 업로드 기능은 이런 생각을 가지고 구현됐습니다.  
+  - 유저 A가 프로필 '꽃'라는 파일명의 이미지를 저장하고, 유저 B 또한 '꽃'이라는 파일명 이미지를 저장했을 때, 각자 다른 이미지임에도 둘 중 한 이미지만 프론트쪽으로 보내준다는 단점이 있다는 것을 알게 되었습니다.
+     -  따라서 UUID를 통해 파일명을 난수화 시켜, 유저가 선택한 파일명이 같아도 겹치지 않게 구현했습니다.
+<details>
+<summary>UUID 이용한 기존 코드</summary>
+<div markdown="1">
 
-| Week |           기간            |       목표        | 보완 | 내용                                                                   |
-| ---- |:-----------------------:|:---------------:|----|:---------------------------------------------------------------------|
-| 1주차 | 06/27/2022 - 07/01/2022 |      CRUD       |       ☑️        | 프로젝트 설계 </br> 게시글/쪽지/댓글 CRUD 기능 구현                                   |
-| 2주차 | 07/04/2022 - 07/08/2022 | SPRING SECURITY |     ☑️     | JWT </br> Spring Security </br> Frontend - Backend 연결 </br> 서비스 기능 추가|
-| 3주차 | 07/11/2022 - 07/15/2022 |       AWS       |         ☑️          | AWS 배포 준비 </br> 서비스 기능 추가 </br> 예외처리                                 |
-| 4주차 | 07/18/2022 - 07/22/2022 |      배포준비       |       ☑️        | Logback </br> </br> 예외처리 </br> 코드 정리 </br> 배포(피드백 받을) 준비             |
-| 5주차 | 07/25/2022 - 07/29/2022 |   피드백 + 리팩토링    |                 | 배포 후 수정                                                              |
+```java
+private String upload(File uploadFile, String dirName) {
+    String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();
+    String uploadImageUrl = putS3(uploadFile, fileName); 
+    removeNewFile(uploadFile);
+    return uploadImageUrl;
+}
+    
+private String putS3(File uploadFile, String fileName) {
+    amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
+    return amazonS3Client.getUrl(bucket, fileName).toString();
+}
+```
+</div>
+</details>  
+<br>  
+
+> #### 6-2 개선한 방식
+- 여기서 한가지 고민이 생겼던게, 유저 A가 n번 이미지를 변경했을 때, n 이전의 모든 이미지 파일이 아직 S3에 쌓여있다는 점이 었습니다.  
+- 파일명을 '유저 고유값인 email 이나, nickname으로 하는 건 어떨까?'  
+  - 그럼 해결되는게 있었는데, 바로 유저가 프로필 이미지를 재변경 했을 때 기존 파일에 덮어씌워지는 구조라 따로 수정-삭제로직이 필요없고, 파일명이 겹치지 않는다는 것이었습니다.  
+- 위에 로직은 꽤나 합리적이지만, 반대로 유저의 고유값이 노출될 수 있다는 점을 우려해서 SHA-256을 이용해 파일명을 암호화하는 로직으로 구현해봤습니다.  
+  - 파일명에는 nickname이 아닌 email을 사용한 이유는, nickname은 중복은 안되지만, 추후 변경할 수 있는 부분이기에 회원가입 후 변하지 않는 값인 email이 더 안전하다 생각했기 때문입니다.
+<details>
+<summary>개선된 코드</summary>
+<div markdown="1">
+
+```java
+private String upload(File uploadFile, String dirName, MemberDetails memberDetails) throws NoSuchAlgorithmException {
+    String fileName = memberDetails.getUsername();
+    String cryptogram = encrypt(fileName);
+    String uploadImageUrl = putS3(uploadFile, dirName+"/"+cryptogram);
+    removeNewFile(uploadFile);
+    return uploadImageUrl;
+}
+
+public String encrypt(String text) throws NoSuchAlgorithmException {
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    md.update(text.getBytes());
+
+    return bytesToHex(md.digest());
+}
+
+private String bytesToHex(byte[] bytes) {
+    StringBuilder builder = new StringBuilder();
+    for (byte b : bytes) {
+        builder.append(String.format("%02x", b));
+    }
+    return builder.toString();
+}
 
 
+private String putS3(File uploadFile, String fileName) {
+    amazonS3Client.putObject(
+            new PutObjectRequest(bucket, fileName, uploadFile)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+    return amazonS3Client.getUrl(bucket, fileName).toString();
+}
+
+```
+</div>
+</details>  
 <br>
-<br>
+<br>  
 
-## 페이지-미리보기
-(PC, Mobile Image 추가 예정)
-<br>
-<br>
-
-## API 명세
-- [Coco API 명세를 보고싶으신가요? 여기를 클릭해주세요](https://equatorial-scooter-0d6.notion.site/API-c4e8d55b8ce54b0c99bd61881961e217)
+## 7. 회고 / 느낀점
+> 프로젝트 개발 회고 글: https://velog.io/@songunnie/WIL-07312022
