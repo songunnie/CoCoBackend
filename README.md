@@ -9,15 +9,16 @@
 - 개발기간: 2022.06.24 ~ 2022.07.29
 - 참여인원: 3명
 - 소개: 사이드 프로젝트 기획/구인 서비스
-- 주소: <a href='https://www.cocoding.xyz' target='_blank'>Coco 방문하기</a>
+- 주소: <a href='https://www.cocoding.xyz' target='_blank'>Coco (클릭시 이동)</a>
 <br>
 <br>
 
 ## 2. 사용기술
-- Backend: `Java 11` `Spring Boot` `Spring Data JPA`
-- Database: `AWS RDS` `MySQL` `H2`
+- Backend: `Java 11` `Spring Boot 2.7.1` `Spring Data JPA` `Gradle 7.4.1`
+- Frontend: `Node.js` `Webpack` `JQuery` `Javascript` `Bulma` `HTML 5` `CSS`
+- Database: `AWS RDS` `MySQL 8.0.28` `H2`
 - Security: `Spring Security`
-- Cloud: `AWS S3` `AWS EC2`
+- Cloud: `AWS S3` `AWS EC2` `AWS CloudFront`
 - CI/CD: `Github Actions`
 <br>
 <br>
@@ -125,4 +126,4 @@ private String putS3(File uploadFile, String fileName) {
 <br>  
 
 ## 7. 회고 / 느낀점
-> 프로젝트 개발 회고 글: https://velog.io/@songunnie/WIL-07312022
+> 프로젝트 개발 회고 글: https://velog.io/@songunnie/Memoir
