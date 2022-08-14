@@ -131,10 +131,42 @@ private String putS3(File uploadFile, String fileName) {
 <br>
 <br>  
 
-## 7. 트러블 슈팅  
-### 7-1 댓글 수정/삭제 오류  
-- 고객 피드백에 따라 댓글 수정 기능 추가  
-<img width="454" alt="comment" src="https://user-images.githubusercontent.com/103922744/184062806-ad4cc869-ef1a-483b-b06b-9c0b0e09d2e7.png">  
+## 7. 배포 후 고객 피드백 
+- 3주 동안 개발을 하고, 배포 후 주말동안 피드백을 받은 것을 바탕으로 남은 한주간 보안 및 트러블 슈팅에 집중했습니다.  
+   - 6월 24일(금) ~ 7월 22일 (금) 동안 개발 후 배포를 진행했습니다.  
+   - 주말 이틀 동안 피드백과 설문을 진행했습니다.  
+  
+<details>
+<summary> 피드백 내용 </summary>
+<div markdown="1">
+
+<br>
+<img width="806" alt="스크린샷 2022-08-14 오후 1 05 59" src="https://user-images.githubusercontent.com/103922744/184522231-e58c8e30-68b9-4fc4-986e-88fce82e9950.png">
+
+<br>
+<br>
+<br>
+ 
+<img width="940" alt="스크린샷 2022-08-14 오후 1 04 13" src="https://user-images.githubusercontent.com/103922744/184522310-846960c8-2341-4455-a948-dcb69882b327.png">
+
+<br>
+ <h3> • 보완되었으면 하는 기능 </h3>
+ 
+&nbsp; &nbsp; 1. XSS 보안  <p>
+&nbsp; &nbsp; 2. 프로필 이미지 업로드 필터  <p>
+&nbsp; &nbsp; 3. 댓글 수정 기능  <p>
+&nbsp; &nbsp; 4. 닉네임 중복체크 기능 <p>
+&nbsp; &nbsp; 5. 댓글을 남긴 유저의 프로필 보기/쪽지 보내기
+ 
+
+</div>
+</details> 
+<br>
+<br>
+
+## 8. 트러블 슈팅  
+### 8-1 댓글 수정/삭제 오류  
+- 고객 피드백에 따른 댓글 수정 기능 추가  
 
 - 문제:  
   - 로컬에서 H2를 이용했을 땐 내가 쓴 댓글만 수정/삭제가 가능했는데 서버를 키고 RDS를 이용해 접속하니 댓글 수정이 안되는 오류가 있었습니다. 수정하려는 댓글(commentId)가 인식이 안되고 있었습니다. 
@@ -143,7 +175,6 @@ private String putS3(File uploadFile, String fileName) {
 - 문제 해결:  
   - `==` 연산자를 사용하던 기존 코드에서, `.equals` 연산자를 통해 해결하였습니다.  
 <br>
-<br> 
 
 <details>
 <summary> 기존 방식 : == 연산자 </summary>
@@ -170,8 +201,6 @@ private String putS3(File uploadFile, String fileName) {
 ```
 </div>
 </details>  
-<br>  
-
 <details>
 <summary> 개선한 방식: .equals 연산자 </summary>
 <div markdown="1">  
@@ -198,17 +227,81 @@ private String putS3(File uploadFile, String fileName) {
 </div>
 </details>  
 <br>
-<br>  
  
-위 방법을 통해, 닉네임 중복체크 문제도 같이 해결할 수 있었습니다.
-
-### 7-2 프로필 이미지 업로드시 파일 확장자 오류
+### 8-2 프로필 이미지 업로드시 파일 확장자 오류
 - 문제:  
-  - 이미지 파일(예: jpg, png 등)뿐만 아니라 모든 파일을 업로드 가능함
+  - 이미지 파일(예: jpg, png 등)뿐만 아니라 모든 파일을 업로드 가능하다는 문제가 있었습니다.
   
 - 문제 해결 1차시도:  
-  - Frontend 단에서 image를 받는 input 태그에 accept 속성을 이용함
+  - Frontend 단에서 image를 받는 input 태그에 accept 속성을 이용했습니다.  
+<details>
+<summary> accept 속성 이용 </summary>
+<div markdown="1">
+<br>
+| profile.hbs 
+<br>
 
+```html
+<input type="file" class="custom-file-input" name="image" accept="image/*">
+```  
 
-## 8. 회고 / 느낀점
+</div>
+</details>  
+<br>  
+ 
+- 문제 해결 2차시도:  
+  - Backend 단에서 `Apache Tika` 사용해서 이미지 확장자만 업로드 가능하도록 구현했습니다.  
+<br>
+ 
+<details>
+<summary> 개선한 방식</summary>
+<div markdown="1">
+<br>
+| build.gradle
+<br>
+
+```java
+implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
+```
+
+<br>
+| FileUtils.java  
+<br>
+
+```java
+public class FileUtils {
+
+    private static final Tika tika = new Tika();
+
+    public static boolean validImgFile(InputStream inputStream) {
+        try {
+            List<String> notValidTypeList = Arrays.asList("image/jpeg", "image/pjpeg", "image/png", "image/gif", "image/bmp", "image/x-windows-bmp");
+
+            String mimeType = tika.detect(inputStream);
+            System.out.println("MimeType : " + mimeType);
+
+            boolean isValid = notValidTypeList.stream().anyMatch(notValidType -> notValidType.equalsIgnoreCase(mimeType));
+
+            return isValid;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
+```
+</div>
+</details>  
+<br>
+<br>
+ 
+## 9. 그외 트러블 슈팅  
+➲ [Optional 사용](https://github.com/BreedingMe/CoCoBackend/wiki/Optional-%EC%82%AC%EC%9A%A9)  
+➲ [ResponseEntity 예외처리](https://github.com/BreedingMe/CoCoBackend/wiki/%EC%98%88%EC%99%B8-%EC%B2%98%EB%A6%AC)  
+➲ [Setter 사용하지 않기](https://github.com/BreedingMe/CoCoBackend/wiki/@Setter-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EA%B8%B0)
+<br>
+<br>
+<br>
+
+## 10. 회고 / 느낀점
 > 프로젝트 개발 회고 글: https://velog.io/@songunnie/Memoir
