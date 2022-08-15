@@ -24,8 +24,9 @@
 <br>
 
 ## 3. ERD 설계
-<p align="center">
- <img width="652" alt="스크린샷 2022-08-09 오후 5 15 17" src="https://user-images.githubusercontent.com/103922744/183599831-272abb85-f55e-4e1f-8d7f-16daffcc523f.png">
+<p align="center"> 
+<img width="1360" alt="스크린샷 2022-08-15 오후 8 38 13" src="https://user-images.githubusercontent.com/103922744/184628497-312b21ea-e255-418d-9311-019ab4b09051.png">
+
 </p>
 <br>
 <br>
