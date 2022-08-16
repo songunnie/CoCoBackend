@@ -31,7 +31,7 @@
 <br>
 <br>
 
-## 4. 프로젝트 
+## 4. 프로젝트 아키텍처
 #### Architecture Version 1
 <img width="1549" alt="스크린샷 2022-08-09 오후 2 20 22" src="https://user-images.githubusercontent.com/103922744/183616139-859ea582-38e9-4cdb-b712-982170e8b7fe.png">
 <br>
